@@ -1,0 +1,35 @@
+---
+import { render } from 'astro:content';
+import { Image } from 'astro:assets';
+import Base from '../../../layouts/Base.astro';
+import { allPosts, getTranslation, postCover, type Post } from '../../../lib/posts';
+import { labels, formatDate } from '../../../config';
+export async function getStaticPaths() {
+  const posts = await allPosts();
+  return posts.map(post => ({ params: { locale: post.locale, id: post.group }, props: { post, posts } }));
+}
+interface Props { post: Post; posts: Post[] }
+const { post, posts } = Astro.props;
+const { locale } = post;
+const t = labels[locale];
+const { Content, headings } = await render(post);
+const toc = headings.filter(h => h.depth <= 3);
+const cover = await postCover(post);
+const translation = getTranslation(post, posts);
+const siblings = posts.filter(p => p.locale === locale);
+const index = siblings.findIndex(p => p.id === post.id);
+const previous = siblings[index - 1];
+const next = siblings[index + 1];
+---
+<Base locale={locale} title={post.data.title} description={post.excerpt || post.data.title} image={cover?.src} article publishedAt={post.data.publishedAt} translationUrl={translation?.url ?? null} noindex={post.data.draft}>
+  <article class:list={['article-page', `layout-${post.data.layout}`, `kind-${post.data.kind}`]} data-pagefind-body data-pagefind-filter={`type:${post.data.kind}`}>
+    <header class="article-header page-width"><a class="breadcrumb" href={`/${locale}/#journal`} data-pagefind-ignore>← {t.journal}</a><div class="article-meta"><span class="eyebrow">{post.data.layout === 'gallery' ? t.gallery : t[post.data.kind]}</span><time datetime={post.data.publishedAt.toISOString()}>{formatDate(post.data.publishedAt, locale)}</time>{post.data.draft && <span class="draft-badge">{t.draft}</span>}</div><h1 data-pagefind-meta="title">{post.data.title}</h1>{post.excerpt && <p class="article-deck">{post.excerpt}</p>}<div class="article-tags tag-list" data-pagefind-ignore>{post.data.tags.map(tag => <a href={`/${locale}/tags/${encodeURIComponent(tag)}/`}>#{tag}</a>)}{translation && <a class="translation-link" href={translation.url}>{locale === 'zh' ? 'Read in English' : '阅读中文版'} ↗</a>}</div>{post.data.demo && <p class="demo-label" data-pagefind-ignore>{t.demo} · {locale === 'zh' ? '用于展示排版与阅读体验' : 'A sample to explore the reading experience'}</p>}</header>
+    {cover && post.data.layout !== 'gallery' && <figure class="article-cover page-width"><Image src={cover} alt={post.data.coverAlt ?? post.data.title} widths={[640, 1000, 1440]} sizes="(max-width: 1100px) 92vw, 1100px" loading="eager" /></figure>}
+    <div class="article-grid page-width">
+      <div class="prose" id="article-body"><Content /></div>
+      {toc.length > 0 && <aside class="toc" data-pagefind-ignore><details open><summary>{t.contents}</summary><nav>{toc.map(h => <a class:list={{ nested: h.depth === 3 }} href={`#${h.slug}`}>{h.text}</a>)}</nav></details></aside>}
+    </div>
+    <div class="article-ending" data-pagefind-ignore><span>✳</span><p>{locale === 'zh' ? '感谢读到这里。' : 'Thank you for spending a little time here.'}</p><a href={`/${locale}/rss.xml`}>{t.rss} ↗</a></div>
+    <nav class="sibling-nav page-width" aria-label={locale === 'zh' ? '相邻文章' : 'Adjacent entries'} data-pagefind-ignore>{previous ? <a href={previous.url}><span>{t.relatedPrevious} ↖</span><strong>{previous.data.title}</strong></a> : <div></div>}{next ? <a href={next.url}><span>{t.relatedNext} ↗</span><strong>{next.data.title}</strong></a> : <div></div>}</nav>
+  </article>
+</Base>

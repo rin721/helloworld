@@ -1,0 +1,11 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { localizedPosts } from '../../../lib/posts';
+import { labels, locales } from '../../../config';
+export function getStaticPaths() { return locales.flatMap(locale => (['tags','types'] as const).map(taxonomy => ({ params: { locale, taxonomy }, props: { locale, taxonomy } }))); }
+const { locale, taxonomy } = Astro.props;
+const t = labels[locale];
+const posts = await localizedPosts(locale);
+const values = taxonomy === 'tags' ? [...new Set(posts.flatMap(p => p.data.tags))].sort() : ['article','diary','note'];
+---
+<Base locale={locale} title={t[taxonomy]}><section class="standard-page page-width"><p class="eyebrow">FIND YOUR OWN THREAD</p><h1 class="page-title">{t[taxonomy]}<span>.</span></h1><p class="page-intro">{locale === 'zh' ? '从一个词开始，发现相互连接的故事。' : 'Begin with a word. Find the stories that connect.'}</p><div class="taxonomy-grid">{values.map(value => <a href={`/${locale}/${taxonomy}/${encodeURIComponent(value)}/`}><h2>{taxonomy === 'tags' ? `#${value}` : t[value as 'article'|'diary'|'note']}</h2><span>{posts.filter(p => taxonomy === 'tags' ? p.data.tags.includes(value) : p.data.kind === value).length} {locale === 'zh' ? '篇记录' : 'entries'} <span aria-hidden="true">↗</span></span></a>)}</div></section></Base>

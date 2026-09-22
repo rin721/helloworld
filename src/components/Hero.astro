@@ -1,0 +1,16 @@
+---
+import { site, type Locale } from '../config';
+import type { Post } from '../lib/posts';
+import Card from './Card.astro';
+interface Props { locale: Locale; featured?: Post }
+const { locale, featured } = Astro.props;
+---
+<section class="hero" aria-labelledby="hero-title">
+  <div class="architecture" aria-hidden="true"><div class="plane plane-a"></div><div class="plane plane-b"></div><div class="plane plane-c"></div><div class="plane plane-d"></div><div class="plane plane-e"></div><div class="plane plane-f"></div><div class="light-plane"></div><div class="floor-plane"></div></div>
+  <div class="hero-content">
+    <div class="hero-panel"><p class="eyebrow hero-kicker">A JOURNAL OF EVERYDAY DISCOVERIES</p><h1 id="hero-title">{site.name}<span>.</span></h1><p class="hero-subtitle">{site.introduction[locale]}</p><p class="hero-description">{site.description[locale]}</p><a class="primary-link" href="#journal">{locale === 'zh' ? '翻开新的篇章' : 'Read the latest'}<span aria-hidden="true">⟶</span></a></div>
+    <p class="margin-note hero-note" aria-hidden="true">SAME<br/>SKIES<br/>DIFFERENT<br/>THOUGHTS<span></span></p>
+  </div>
+  <div class="hero-bottom"><p class="margin-note lower-note" aria-hidden="true"><span></span>SLOWER<br/>DEEPER<br/>A LITTLE<br/>CLOSER</p>{featured && <Card post={featured} featured />}</div>
+  <a class="scroll-cue" href="#journal" aria-label={locale === 'zh' ? '浏览最近记录' : 'Browse entries'}>SCROLL TO EXPLORE <span>↓</span></a>
+</section>

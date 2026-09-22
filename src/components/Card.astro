@@ -1,0 +1,20 @@
+---
+import { Image } from 'astro:assets';
+import { labels, formatDate } from '../config';
+import { postCover, type Post } from '../lib/posts';
+interface Props { post: Post; featured?: boolean; index?: number }
+const { post, featured = false, index } = Astro.props;
+const { locale } = post;
+const t = labels[locale];
+const cover = await postCover(post);
+---
+<article class:list={['entry-card', { 'featured-card': featured, 'has-image': !!cover, 'gallery-card': post.data.layout === 'gallery' }]}>
+  {cover && <a class="card-image-link" href={post.url} tabindex="-1" aria-hidden="true"><Image src={cover} alt="" widths={[400, 720]} sizes="(max-width: 680px) 90vw, 320px" loading={featured ? 'eager' : 'lazy'} /></a>}
+  <div class="card-body">
+    <div class="card-meta"><span>{featured ? t.featured : post.data.layout === 'gallery' ? t.gallery : t[post.data.kind]}{!featured && post.data.pinnedOrder !== undefined && <span class="pin-label"> / {t.pinned}</span>}</span><time datetime={post.data.publishedAt.toISOString()}>{formatDate(post.data.publishedAt, locale)}</time></div>
+    <h2><a href={post.url}>{post.data.title}</a></h2>
+    {post.excerpt && <p class="card-excerpt">{post.excerpt}</p>}
+    <div class="card-bottom"><div class="tag-list">{post.data.tags.map(tag => <a href={`/${locale}/tags/${encodeURIComponent(tag)}/`}>#{tag}</a>)}{post.data.draft && <span class="draft-badge">{t.draft}</span>}</div><a class="card-arrow" href={post.url} aria-label={`${t.more}：${post.data.title}`}>↗</a></div>
+  </div>
+  {index !== undefined && !cover && <span class="entry-number" aria-hidden="true">{String(index).padStart(2, '0')}</span>}
+</article>

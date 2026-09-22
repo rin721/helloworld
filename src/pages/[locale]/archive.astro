@@ -1,0 +1,11 @@
+---
+import Base from '../../layouts/Base.astro';
+import { localizedPosts } from '../../lib/posts';
+import { labels, locales, formatDate } from '../../config';
+export function getStaticPaths() { return locales.map(locale => ({ params: { locale }, props: { locale } })); }
+const { locale } = Astro.props;
+const t = labels[locale];
+const posts = (await localizedPosts(locale)).sort((a,b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
+const groups = Map.groupBy(posts, p => p.data.publishedAt.toISOString().slice(0,7));
+---
+<Base locale={locale} title={t.archive}><section class="standard-page page-width"><p class="eyebrow">A COLLECTION OF MOMENTS</p><h1 class="page-title">{t.archive}<span>.</span></h1><p class="page-intro">{locale === 'zh' ? '沿着时间的线索，重访那些写下的瞬间。' : 'Follow the thread of time. Revisit the moments we kept.'}</p>{posts.length === 0 && <p class="empty-state">{t.empty}</p>}<div class="archive">{[...groups].map(([month, entries]) => <section class="archive-group"><h2>{month.replace('-', ' / ')}</h2><div>{entries.map(p => <a class="archive-entry" href={p.url}><time datetime={p.data.publishedAt.toISOString()}>{formatDate(p.data.publishedAt, locale)}</time><span>{p.data.title}</span><small>{t[p.data.kind]}</small><span aria-hidden="true">↗</span></a>)}</div></section>)}</div></section></Base>

@@ -1,0 +1,31 @@
+---
+import Base from '../../layouts/Base.astro';
+import Hero from '../../components/Hero.astro';
+import Card from '../../components/Card.astro';
+import Pagination from '../../components/Pagination.astro';
+import { listRoutes, type Post } from '../../lib/posts';
+import { labels, site, type Locale } from '../../config';
+export const getStaticPaths = listRoutes;
+interface Props { locale: Locale; items: Post[]; all: Post[]; page: number; total: number; count: number; filter?: { type: 'tags' | 'types'; value: string } }
+const { locale, items, all, page, total, count, filter } = Astro.props;
+const t = labels[locale];
+const first = !filter && page === 1;
+const chronological = [...all].sort((a,b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
+const featured = chronological.find(p => p.data.featured) ?? chronological[0];
+const tags = [...new Set(all.flatMap(p => p.data.tags))].sort();
+const heading = filter ? filter.type === 'tags' ? `#${filter.value}` : t[filter.value as 'article' | 'diary' | 'note'] : t.latest;
+const Heading = first ? 'h2' : 'h1';
+const other = locale === 'zh' ? 'en' : 'zh';
+const alternate = filter?.type === 'tags' ? `/${other}/tags/` : filter ? `/${other}/types/${filter.value}/` : `/${other}/`;
+---
+<Base locale={locale} title={first ? site.name : `${heading}${page > 1 ? ` · ${page}` : ''}`} translationUrl={alternate} hreflangUrl={filter?.type === 'tags' || page > 1 ? null : alternate}>
+  {first && <Hero locale={locale} featured={featured} />}
+  <section id="journal" class:list={['journal-section page-width', { 'standalone-list': !first }]}>
+    <div class="section-heading"><div><p class="eyebrow">THE JOURNAL</p><Heading class:list={{ 'section-title': true, 'filtered-title': !!filter }}>{heading}<span class="title-period">.</span></Heading></div><p class="section-note">{locale === 'zh' ? '一些思考，一些日常，一些值得留下的瞬间。' : 'Thoughts, moments, and things worth keeping.'}<br/><span>{count} {locale === 'zh' ? '篇记录' : 'entries'}</span></p></div>
+    <div class="filter-bar"><nav class="type-filters" aria-label={t.types}><a href={`/${locale}/#journal`} aria-current={!filter ? 'page' : undefined}>{t.all}</a>{(['article','diary','note'] as const).map(kind => <a href={`/${locale}/types/${kind}/`} aria-current={filter?.type === 'types' && filter.value === kind ? 'page' : undefined}>{t[kind]}</a>)}</nav>
+      <details class="tag-filter"><summary>{filter?.type === 'tags' ? `#${filter.value}` : t.tags}<span>＋</span></summary><div class="tag-menu">{tags.map(tag => <a href={`/${locale}/tags/${encodeURIComponent(tag)}/`}>#{tag}</a>)}<a href={`/${locale}/tags/`}>{t.allTags} →</a></div></details></div>
+    <div class="entry-list">{items.length ? items.map((post, i) => <Card post={post} index={(page - 1) * site.pageSize + i + 1} />) : <p class="empty-state">{t.empty}</p>}</div>
+    <Pagination locale={locale} page={page} total={total} filter={filter} />
+    <div class="journal-end"><span></span><p>{locale === 'zh' ? '日常很小，也值得被看见。' : 'Small things, seen a little more closely.'}</p><span></span></div>
+  </section>
+</Base>

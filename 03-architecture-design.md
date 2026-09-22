@@ -299,3 +299,29 @@ Kubernetes
 [3]: https://tailwindcss.com/docs/installation/framework-guides?utm_source=chatgpt.com "Framework guides - Tailwind CSS"
 [4]: https://v7-2.previews.docs.astro.build/en/guides/images/?utm_source=chatgpt.com "Images | Docs"
 [5]: https://pagefind.app/docs/?utm_source=chatgpt.com "Getting Started with Pagefind | Pagefind"
+
+---
+
+## 首版实现补充（2026-09-23）
+
+上文技术基线由用户确认并保留。以下补充首版实现结构，不替换选型。
+
+### 内容与页面分层
+
+`content/posts` 使用同目录的中文／英文 Markdown 表示一篇内容的语言版本。`src/content.config.ts` 定义集合 schema；`scripts/check-content.ts` 校验文件和图片；`src/lib/rules.ts` 定义纯计算规则；`src/lib/posts.ts` 完成集合查询、公开过滤、译文关系、排序和静态分页。
+
+`src/pages` 在构建期生成首页、详情、类型／标签、归档、搜索入口、关于、404 和 RSS。`src/layouts` 与 `src/components` 共用页面结构。`src/scripts` 仅提供原生 TypeScript 浏览器交互。
+
+### i18n 与搜索
+
+使用 `/zh/` 和 `/en/`，默认中文。界面词典集中于配置；文章翻译由内容目录关联，翻译可选，缺失时提示而不复制原文。Pagefind 在 `astro build` 后索引带有 `data-pagefind-body` 的文章，按 HTML 语言分别建立索引。
+
+### 构建与发布
+
+完整构建链为内容校验 → Astro 静态生成和图片处理 → Pagefind 索引 → 产物验证。`SITE_URL` 用于 canonical、RSS 和 Sitemap；Cloudflare Pages 提供静态文件，不启用服务端适配器或 Functions。
+
+GitHub Actions 执行类型、单元、构建和 Playwright 验收；Pages Git 集成按部署配置独立构建。工程命令、部署变量和验收状态分别记录于 [开发规范](docs/development.md)、[部署验收](docs/deployment.md) 和 [验收记录](docs/acceptance.md)。
+
+### 长期维护
+
+核心内容协议和架构决策分别由 [内容设计](02-content-design.md) 与 [ADR-0001](docs/decisions/0001-build-first-content.md) 维护。协作约束由 [AGENTS.md](AGENTS.md) 维护，不将 UI 细节或历史沟通复制为新的技术基线。

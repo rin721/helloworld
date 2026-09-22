@@ -1,0 +1,9 @@
+---
+import Base from '../../layouts/Base.astro';
+import { labels, locales } from '../../config';
+export function getStaticPaths() { return locales.map(locale => ({ params: { locale }, props: { locale } })); }
+const { locale } = Astro.props;
+const t = labels[locale];
+---
+<Base locale={locale} title={t.search}><section class="standard-page page-width search-page"><p class="eyebrow">SOMETHING YOU'RE LOOKING FOR</p><h1 class="page-title">{t.search}<span>.</span></h1><form id="search-form" role="search"><label for="search-input" class="sr-only">{t.searchLabel}</label><div class="search-field"><input id="search-input" type="search" name="q" placeholder={t.searchPlaceholder} autocomplete="off"/><button type="submit" aria-label={t.search}>⟶</button></div></form><p id="search-status" role="status" aria-live="polite">{t.searchHint}</p><button id="search-retry" class="text-link" hidden>{t.retry}</button><div id="search-results"></div><button id="search-more" class="primary-link" hidden>{t.next} ↓</button><noscript><p>{locale === 'zh' ? '搜索需要启用 JavaScript。你也可以通过归档或标签浏览内容。' : 'Search requires JavaScript. Browse the archive or tags instead.'}</p><a href={`/${locale}/archive/`}>{t.archive} →</a></noscript></section></Base>
+<script>import '../../scripts/search';</script>

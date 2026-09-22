@@ -1,0 +1,78 @@
+---
+import '../styles/global.css';
+import { site, labels, type Locale } from '../config';
+interface Props { locale?: Locale; title: string; description?: string; image?: string; article?: boolean; translationUrl?: string | null; hreflangUrl?: string | null; publishedAt?: Date; noindex?: boolean }
+const { locale = 'zh', title, description = site.description[locale], image, article = false, translationUrl, hreflangUrl, publishedAt, noindex = false } = Astro.props;
+const t = labels[locale];
+const other = locale === 'zh' ? 'en' : 'zh';
+const path = Astro.url.pathname;
+const canonical = new URL(path === '/404/' ? '/404.html' : path, Astro.site);
+const alternate = translationUrl === null ? null : translationUrl ?? path.replace(`/${locale}/`, `/${other}/`);
+const alternateMetadata = hreflangUrl === undefined ? alternate : hreflangUrl;
+const ogImage = image ? new URL(image, Astro.site).href : undefined;
+const schema = { '@context': 'https://schema.org', '@type': article ? 'BlogPosting' : 'WebSite', name: title, headline: article ? title : undefined, description, url: canonical.href, inLanguage: locale === 'zh' ? 'zh-CN' : 'en', author: { '@type': 'Person', name: site.author.name }, datePublished: publishedAt?.toISOString(), image: ogImage };
+---
+<!doctype html>
+<html lang={locale === 'zh' ? 'zh-CN' : 'en'}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light dark" />
+    <title>{title === site.name ? title : `${title} · ${site.name}`}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex,nofollow" />}
+    <link rel="canonical" href={canonical} />
+    {!noindex && <link rel="alternate" hreflang={locale === 'zh' ? 'zh-CN' : 'en'} href={canonical} />}
+    {!noindex && alternateMetadata && <link rel="alternate" hreflang={other === 'zh' ? 'zh-CN' : 'en'} href={new URL(alternateMetadata, Astro.site)} />}
+    <link rel="alternate" type="application/rss+xml" title={`${site.name} · ${locale}`} href={`/${locale}/rss.xml`} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={article ? 'article' : 'website'} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content={site.name} />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta name="twitter:card" content={ogImage ? 'summary_large_image' : 'summary'} />
+    <script type="application/ld+json" set:html={JSON.stringify(schema).replace(/</g, '\\u003c')} />
+    <script is:inline>
+      document.documentElement.classList.add('js');
+      try { const stored = localStorage.getItem('theme'); document.documentElement.dataset.theme = ['light','dark'].includes(stored) ? stored : 'system'; }
+      catch { document.documentElement.dataset.theme = 'system'; }
+      document.documentElement.dataset.resolvedTheme = document.documentElement.dataset.theme === 'system' ? (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light') : document.documentElement.dataset.theme;
+    </script>
+  </head>
+  <body data-locale={locale}>
+    <a class="skip-link" href="#main">{t.skip}</a>
+    <header class="site-header" data-pagefind-ignore>
+      <div class="header-inner">
+        <a class="wordmark" href={`/${locale}/`} aria-label={`${site.name} — ${t.home}`}>{site.name.toUpperCase()}<span class="wordmark-dot">.</span></a>
+        <button class="menu-toggle icon-button" aria-label={t.menu} aria-controls="main-nav" aria-expanded="false"><span></span><span></span></button>
+        <nav id="main-nav" aria-label={t.menu}>
+          <a class:list={{ active: path === `/${locale}/` }} href={`/${locale}/#journal`}>{t.journal}</a>
+          <a class:list={{ active: path.includes('/archive/') }} href={`/${locale}/archive/`}>{t.archive}</a>
+          <a class:list={{ active: path.includes('/about/') }} href={`/${locale}/about/`}>{t.about}</a>
+          <span class="nav-divider"></span>
+          {alternate ? <a class="language-link" href={alternate} lang={other} aria-label={other === 'en' ? 'Switch to English' : '切换到中文'}>{other === 'en' ? 'EN' : '中文'}</a> : <button class="language-link" data-untranslated aria-label={other === 'en' ? 'English translation unavailable' : '暂无中文译文'}>{other === 'en' ? 'EN' : '中文'}<span class="unavailable-dot">·</span></button>}
+          <a class="icon-button search-link" href={`/${locale}/search/`} aria-label={t.search}><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.8"/><path d="m16 16 5 5"/></svg></a>
+        </nav>
+      </div>
+    </header>
+    <main id="main"><slot /></main>
+    <footer class="site-footer" data-pagefind-ignore>
+      <div class="footer-top"><div><a class="wordmark" href={`/${locale}/`}>{site.name.toUpperCase()}<span class="wordmark-dot">.</span></a><p>{locale === 'zh' ? '认真生活，慢慢记录。' : 'Live attentively. Write slowly.'}</p></div>
+        <div class="footer-links"><a href={`/${locale}/tags/`}>{t.tags}</a><a href={`/${locale}/types/`}>{t.types}</a><a href={`/${locale}/rss.xml`}>{t.rss} ↗</a></div>
+      </div>
+      <div class="footer-bottom"><span>© {new Date().getUTCFullYear()} {site.name} <span class="footer-dot">·</span> {locale === 'zh' ? '文字与光影的留存地' : 'A home for words & light'}</span>
+        <label class="theme-control">{t.theme}<select id="theme-select" aria-label={t.theme}><option value="system">{t.system}</option><option value="light">{t.light}</option><option value="dark">{t.dark}</option></select></label>
+      </div>
+    </footer>
+    <dialog id="translation-dialog" class="notice-dialog" aria-labelledby="translation-notice"><button class="dialog-close" data-close-dialog aria-label={t.close}>×</button><p class="eyebrow">A NOTE ON LANGUAGE</p><p id="translation-notice">{t.untranslated}</p><a class="text-link" href={`/${other}/`}>{t.otherHome} →</a></dialog>
+    <dialog id="lightbox" class="lightbox" aria-label={locale === 'zh' ? '图片查看器' : 'Image viewer'}>
+      <button class="dialog-close" data-close-dialog aria-label={t.close}>×</button>
+      <button class="lightbox-prev" aria-label={locale === 'zh' ? '上一张图片' : 'Previous image'}>←</button>
+      <figure><img id="lightbox-image" alt="" /><figcaption></figcaption></figure>
+      <button class="lightbox-next" aria-label={locale === 'zh' ? '下一张图片' : 'Next image'}>→</button>
+    </dialog>
+    <script>import '../scripts/interactions';</script>
+  </body>
+</html>

@@ -1,0 +1,13 @@
+---
+import { labels, type Locale } from '../config';
+import { listPath } from '../lib/posts';
+interface Props { locale: Locale; page: number; total: number; filter?: { type: 'tags' | 'types'; value: string } }
+const { locale, page, total, filter } = Astro.props;
+const t = labels[locale];
+const numbers = Array.from({ length: total }, (_, i) => i + 1).filter(n => n === 1 || n === total || Math.abs(n - page) <= 2);
+---
+{total > 1 && <nav class="pagination" aria-label={locale === 'zh' ? '分页' : 'Pagination'}>
+  {page > 1 ? <a rel="prev" href={`${listPath(locale, page - 1, filter)}#journal`}>← {t.previous}</a> : <span class="disabled">← {t.previous}</span>}
+  <div>{numbers.map((n, i) => <>{i > 0 && n - numbers[i - 1] > 1 && <span>…</span>}<a href={`${listPath(locale, n, filter)}#journal`} aria-current={n === page ? 'page' : undefined}>{String(n).padStart(2, '0')}</a></>)}</div>
+  {page < total ? <a rel="next" href={`${listPath(locale, page + 1, filter)}#journal`}>{t.next} →</a> : <span class="disabled">{t.next} →</span>}
+</nav>}

@@ -1,0 +1,11 @@
+---
+import { getEntry, render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import { labels, locales } from '../../config';
+export function getStaticPaths() { return locales.map(locale => ({ params: { locale }, props: { locale } })); }
+const { locale } = Astro.props;
+const entry = await getEntry('pages', `about-${locale}`);
+if (!entry) throw new Error(`Missing about page: ${locale}`);
+const { Content } = await render(entry);
+---
+<Base locale={locale} title={labels[locale].about}><section class="standard-page page-width about-page"><p class="eyebrow">BEHIND THE WORDS</p><h1 class="page-title">{entry.data.title}<span>.</span></h1><div class="about-art" aria-hidden="true"><div></div><span>HELLO,<br/>WORLD.</span></div><div class="prose"><Content /></div></section></Base>
