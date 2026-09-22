@@ -45,4 +45,4 @@ pnpm preview --port 4330
 
 ## 当前交付状态
 
-本任务交付本地应用、静态构建、CI 文件和部署说明。未绑定 Cloudflare 项目、未设置真实域名、未进行远端推送或线上部署。具体验收结果见 `docs/acceptance.md`。
+本任务交付本地应用、静态构建、CI 文件和部署说明。代码已推送到 GitHub `main`，并已触发 GitHub Actions 验收；未绑定 Cloudflare 项目、未设置真实域名、未执行线上部署。具体验收结果见 `docs/acceptance.md`。
