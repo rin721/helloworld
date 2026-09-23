@@ -1,4 +1,4 @@
----
+﻿---
 /**
  * 模态层：译文提示、图片查看和移动导航共用。
  * 控制器负责焦点循环、背景 inert、滚动锁定、Escape、遮罩点击与关闭后焦点恢复。
@@ -8,8 +8,8 @@ interface Props { id: string; labelledby: string; closeLabel: string; title?: st
 const { id, labelledby, closeLabel, title, size = 'md', variant = 'panel', class: className = '' } = Astro.props;
 const widths = { sm: 'max-w-[460px]', md: 'max-w-[580px]', wide: 'max-w-[min(1200px,94vw)]' }[size];
 const surface = variant === 'bare'
-  ? 'border-0 bg-transparent shadow-none p-0'
-  : ['bg-surface shadow-float', size === 'wide' ? 'p-4 md:p-6' : 'p-6 md:p-8'].join(' ');
+  ? 'rounded-none border-0 bg-transparent p-0'
+  : ['rounded-card border border-line bg-surface', size === 'wide' ? 'p-4 md:p-6' : 'p-6 md:p-8'].join(' ');
 ---
 <div id={id} class="fixed inset-0 z-50" data-modal hidden>
   <div class="overlay" data-modal-overlay></div>

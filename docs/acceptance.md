@@ -172,7 +172,7 @@ Windows 本地使用 Node.js 24.11.1、pnpm 10.22.0、Astro 7.3.3。依赖由 `p
 
 ## 交付边界
 
-本地实现和构建验收已完成。首版实现提交为 `16ae573`，已推送到 GitHub `main`；GitHub Actions 工作流「Blog quality」在 Node.js 24 与 pnpm 10.22.0 下执行 `pnpm verify` 成功（Run 35760538041）。首页背景重设计、全站组件化重构与软导航接入在本地完成并通过 `pnpm verify`，尚未提交或推送，等待用户确认后再按同一流程交付。Cloudflare Pages 的配置步骤已写入 [部署指南](deployment.md)，尚未绑定项目、真实域名或执行线上发布。本地验证结论与远端 CI 分别记录，不用其一替代另一项。
+本地实现和构建验收已完成。首版实现提交为 `16ae573`，本轮前台视觉体系迭代（背景重设计、组件化重构、软导航接入、页头滚动、配色系统与内页背景清理）提交为 `d1d9187`，均已推送到 GitHub `main`；GitHub Actions 工作流「Blog quality」在 Node.js 24 与 pnpm 10.22.0 下执行 `pnpm verify` 成功（首版 Run 35760538041、本轮 Run 35865294608）。Cloudflare Pages 的配置步骤已写入 [部署指南](deployment.md)，尚未绑定项目、真实域名或执行线上发布。本地验证结论与远端 CI 分别记录，不用其一替代另一项。
 
 当前名称为 Hello World，文章和图片明确标注为演示内容，作者介绍没有虚构个人履历。正式发布前按 [内容维护指南](content/authoring.md) 替换内容，在 `src/config.ts` 更新站点信息，并设置真实 `SITE_URL` 后重新运行 `pnpm verify`。
 

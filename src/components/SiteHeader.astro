@@ -1,4 +1,4 @@
----
+﻿---
 /** 站点页头：词标、主导航、语言切换、外观与配色设置、移动端菜单入口。 */
 import { site, labels, type Locale } from '../config';
 import IconButton from './ui/IconButton.astro';
@@ -36,7 +36,7 @@ const languageLink = alternate
   data-header-state="top"
 >
   {/* 强调表面单独一层：用透明度淡入代替直接改背景与阴影，切换过程更平顺。 */}
-  <span class="pointer-events-none absolute inset-0 bg-glass-strong opacity-0 shadow-card transition-opacity delay-[40ms] duration-[360ms] ease-soft group-data-[header-state=pinned]:opacity-100" data-header-surface aria-hidden="true"></span>
+  <span class="pointer-events-none absolute inset-0 border-b border-line bg-glass-strong opacity-0 transition-opacity delay-[40ms] duration-[360ms] ease-soft group-data-[header-state=pinned]:opacity-100" data-header-surface aria-hidden="true"></span>
   <div class="header-inner page-wide relative flex min-h-[70px] items-center justify-between gap-4 md:min-h-[84px] md:gap-6">
     <a class="font-serif text-[15px] tracking-[.2em] whitespace-nowrap min-[520px]:text-[17px] min-[520px]:tracking-[.28em] md:text-[20px]" href={`/${locale}/`} aria-label={`${site.name} — ${t.home}`}>
       {site.name.toUpperCase()}<span class="text-accent tracking-normal">.</span>

@@ -1,0 +1,12 @@
+﻿import { readFileSync } from "node:fs";
+const css = readFileSync("src/styles/global.css", "utf8");
+const luminance = hex => { const v = hex.replace("#", ""); const [r, g, b] = [0, 2, 4].map(i => parseInt(v.slice(i, i + 2), 16) / 255); const f = c => c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4; return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b); };
+const L = hex => { const Y = luminance(hex); return Y > 0.008856 ? 116 * Math.cbrt(Y) - 16 : 903.3 * Y; };
+const darkSurface = css.match(/:root\[data-theme='dark'\] \{[\s\S]*?--c-surface: (#[0-9a-f]{6});/)[1];
+const canvases = { slate: "#101a24", jade: "#0f1c1a", violet: "#14121e", clay: "#1d1512", graphite: "#14171a" };
+console.log("dark card =", darkSurface, "L* =", L(darkSurface).toFixed(1));
+for (const [name, canvas] of Object.entries(canvases)) console.log(`dark ${name.padEnd(9)} canvas=${canvas} L*=${L(canvas).toFixed(1)}  dL*(page→card)=${(L(darkSurface) - L(canvas)).toFixed(1)}`);
+const softDark = css.match(/:root\[data-theme='dark'\] \{[\s\S]*?--c-soft: (#[0-9a-f]{6});/)[1];
+console.log("dark soft =", softDark, "dL*(card→soft) =", (L(softDark) - L(darkSurface)).toFixed(1));
+const softLight = css.match(/:root \{[\s\S]*?--c-soft: (#[0-9a-f]{6});/)[1];
+console.log("light soft =", softLight, "dL*(soft→card) =", (L("#ffffff") - L(softLight)).toFixed(1));

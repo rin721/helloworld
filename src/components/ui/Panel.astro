@@ -1,7 +1,8 @@
 ---
 /**
- * 面板：站点的基本表面。直角矩形、柔和阴影、可选半透明材质。
+ * 面板：站点的基本表面。圆角、无阴影，靠底色与页面区分层次。
  * 所有卡片、浮层内容、页头与侧栏都由它派生，页面只调整间距与网格。
+ * `lift` 只改变底色（悬停与键盘焦点一致），不再有位移与投影。
  */
 interface Props {
   [key: string]: unknown;
@@ -13,13 +14,14 @@ interface Props {
 }
 const { as: Tag = 'div', variant = 'surface', padding = 'md', lift = false, class: className = '', ...rest } = Astro.props;
 const surfaces = {
-  surface: 'bg-surface shadow-card',
+  surface: 'bg-surface',
   glass: 'bg-glass backdrop-blur-md',
   soft: 'bg-soft',
   plain: 'bg-transparent',
 }[variant];
 const paddings = { none: '', sm: 'p-4', md: 'p-6', lg: 'p-7 md:p-10' }[padding];
+const hover = lift ? (variant === 'glass' ? 'glass-hover' : 'card-hover') : '';
 ---
-<Tag class={[surfaces, paddings, lift ? 'lift' : '', 'relative', className].join(' ')} {...rest}>
+<Tag class={[surfaces, paddings, hover, 'relative rounded-card', className].join(' ')} {...rest}>
   <slot />
 </Tag>

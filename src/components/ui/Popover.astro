@@ -1,4 +1,4 @@
----
+﻿---
 /**
  * 浮层：由按钮触发的浮层（链接列表或设置面板），替代 details 下拉。
  * 控制器负责外部点击、Escape 与焦点返回；`arrows="none"` 时把方向键让给面板内的自定义控件
@@ -26,7 +26,7 @@ const hasCustomTrigger = Astro.slots.has('trigger');
   )}
   <div
     id={id}
-    class={['popover-panel absolute top-[calc(100%+8px)] z-30 min-w-[220px] max-w-[320px] bg-surface p-4 shadow-float', align === 'end' ? 'right-0' : 'left-0', panelClass].join(' ')}
+    class={['popover-panel absolute top-[calc(100%+8px)] z-30 min-w-[220px] max-w-[320px] rounded-card border border-line bg-surface p-4', align === 'end' ? 'right-0' : 'left-0', panelClass].join(' ')}
     role="group"
     aria-label={label}
     data-popover-panel

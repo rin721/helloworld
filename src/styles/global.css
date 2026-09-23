@@ -4,6 +4,13 @@
    语义颜色本身已经随主题切换，这里只服务少数需要工具类分支的细节。 */
 @custom-variant dark (&:where([data-resolved-theme='dark'], [data-resolved-theme='dark'] *));
 
+/* 圆角刻度：卡片与面板 16px、控件 8px、小芯片 6px（对齐参考站点的 1rem / 0.5rem 比例）。 */
+@theme {
+  --radius-card: 16px;
+  --radius-control: 8px;
+  --radius-chip: 6px;
+}
+
 @theme {
   --font-sans: 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
   --font-serif: 'Baskerville', 'Georgia', 'Noto Serif SC', 'Songti SC', 'SimSun', serif;
@@ -16,9 +23,9 @@
    组件只使用 @theme inline 暴露的颜色、阴影与字体，不直接写色值。
    --------------------------------------------------------------- */
 :root {
-  --c-canvas: #eef3f8;
+  --c-canvas: #e8eef5;
   --c-surface: #ffffff;
-  --c-soft: #e8eff6;
+  --c-soft: #e4ecf4;
   --c-glass: rgba(250, 253, 255, .82);
   --c-glass-strong: rgba(255, 255, 255, .93);
   --c-ink: #172330;
@@ -38,11 +45,8 @@
   --c-swatch-violet: #5b4a86;
   --c-swatch-clay: #93502f;
   --c-swatch-graphite: #4b5359;
-  --elev-panel: 0 1px 2px rgba(23, 35, 48, .04), 0 14px 34px -20px rgba(23, 35, 48, .22);
-  --elev-card: 0 1px 2px rgba(23, 35, 48, .03), 0 10px 26px -18px rgba(23, 35, 48, .18);
-  --elev-float: 0 28px 64px -28px rgba(23, 35, 48, .34), 0 2px 8px rgba(23, 35, 48, .06);
   --backdrop-base: radial-gradient(130% 100% at 40% 26%, #f9fcfe 0%, #eef5fa 46%, #dde8f3 100%);
-  --backdrop-page-base: radial-gradient(130% 110% at 34% 12%, #f7fbfe 0%, #e9f1f8 52%, #d9e5f1 100%);
+  --backdrop-page-base: radial-gradient(130% 110% at 34% 12%, #ecf2f9 0%, #e3ebf3 52%, #d5e0ec 100%);
   --backdrop-far-1: #e7eff8;
   --backdrop-far-2: #e1ebf5;
   --backdrop-mid-1: #d4e2f0;
@@ -51,8 +55,6 @@
   --backdrop-plate: #e8f0f8;
   --backdrop-edge: rgba(255, 255, 255, .72);
   --backdrop-line: rgba(104, 134, 164, .2);
-  --backdrop-shadow: 0 20px 46px rgba(62, 88, 120, .13), 0 2px 10px rgba(62, 88, 120, .07);
-  --backdrop-shadow-soft: 0 13px 32px rgba(62, 88, 120, .09);
   color-scheme: light;
 }
 :root[data-theme='dark'] {
@@ -71,11 +73,8 @@
   --c-on-accent: #101a24;
   --c-highlight: rgba(198, 220, 242, .16);
   --c-on-backdrop: rgba(255, 255, 255, .9);
-  --elev-panel: 0 1px 2px rgba(0, 0, 0, .3), 0 18px 40px -22px rgba(0, 0, 0, .6);
-  --elev-card: 0 1px 2px rgba(0, 0, 0, .24), 0 12px 30px -20px rgba(0, 0, 0, .5);
-  --elev-float: 0 30px 70px -30px rgba(0, 0, 0, .7), 0 2px 10px rgba(0, 0, 0, .32);
   --backdrop-base: radial-gradient(130% 100% at 40% 26%, #2b4159 0%, #20334a 46%, #16232f 100%);
-  --backdrop-page-base: radial-gradient(130% 110% at 34% 12%, #22364c 0%, #1a2b3d 52%, #14202c 100%);
+  --backdrop-page-base: radial-gradient(130% 110% at 34% 12%, #101a24 0%, #0c141b 52%, #090f15 100%);
   --backdrop-far-1: #2b4058;
   --backdrop-far-2: #24374b;
   --backdrop-mid-1: #3e5878;
@@ -84,8 +83,6 @@
   --backdrop-plate: #365070;
   --backdrop-edge: rgba(198, 220, 242, .16);
   --backdrop-line: rgba(176, 206, 238, .18);
-  --backdrop-shadow: 0 22px 50px rgba(0, 0, 0, .42), 0 2px 12px rgba(0, 0, 0, .26);
-  --backdrop-shadow-soft: 0 14px 34px rgba(0, 0, 0, .32);
   color-scheme: dark;
 }
 @media (prefers-color-scheme: dark) {
@@ -104,11 +101,8 @@
     --c-accent-soft: #24384b;
     --c-on-accent: #101a24;
     --c-highlight: rgba(198, 220, 242, .16);
-    --elev-panel: 0 1px 2px rgba(0, 0, 0, .3), 0 18px 40px -22px rgba(0, 0, 0, .6);
-    --elev-card: 0 1px 2px rgba(0, 0, 0, .24), 0 12px 30px -20px rgba(0, 0, 0, .5);
-    --elev-float: 0 30px 70px -30px rgba(0, 0, 0, .7), 0 2px 10px rgba(0, 0, 0, .32);
     --backdrop-base: radial-gradient(130% 100% at 40% 26%, #2b4159 0%, #20334a 46%, #16232f 100%);
-    --backdrop-page-base: radial-gradient(130% 110% at 34% 12%, #22364c 0%, #1a2b3d 52%, #14202c 100%);
+    --backdrop-page-base: radial-gradient(130% 110% at 34% 12%, #101a24 0%, #0c141b 52%, #090f15 100%);
     --backdrop-far-1: #2b4058;
     --backdrop-far-2: #24374b;
     --backdrop-mid-1: #3e5878;
@@ -117,8 +111,6 @@
     --backdrop-plate: #365070;
     --backdrop-edge: rgba(198, 220, 242, .16);
     --backdrop-line: rgba(176, 206, 238, .18);
-    --backdrop-shadow: 0 22px 50px rgba(0, 0, 0, .42), 0 2px 12px rgba(0, 0, 0, .26);
-    --backdrop-shadow-soft: 0 14px 34px rgba(0, 0, 0, .32);
     color-scheme: dark;
   }
 }
@@ -129,8 +121,8 @@
    只替换色相与彩度，因此对比度与阅读舒适度可控。默认 slate 与既有取值完全一致。
    --------------------------------------------------------------- */
 :root[data-palette='jade'] {
-  --c-canvas: #edf4f2;
-  --c-soft: #e5f0ed;
+  --c-canvas: #e5efeb;
+  --c-soft: #e0eae6;
   --c-glass: rgba(250, 253, 252, .82);
   --c-glass-strong: rgba(255, 255, 255, .93);
   --c-line: #d9e6e2;
@@ -140,7 +132,7 @@
   --c-on-accent: #ffffff;
   --c-on-backdrop: rgba(244, 255, 252, .9);
   --backdrop-base: radial-gradient(130% 100% at 40% 26%, #f8fcfb 0%, #edf4f2 46%, #dce8e4 100%);
-  --backdrop-page-base: radial-gradient(130% 110% at 34% 12%, #f6fbfa 0%, #e8f1ee 52%, #d8e6e1 100%);
+  --backdrop-page-base: radial-gradient(130% 110% at 34% 12%, #eaf2ef 0%, #e1ebe7 52%, #d3e0da 100%);
   --backdrop-far-1: #e6f0ec;
   --backdrop-far-2: #e0ebe6;
   --backdrop-mid-1: #d3e3dd;
@@ -162,7 +154,7 @@
   --c-on-accent: #0f1c1a;
   --c-on-backdrop: rgba(233, 255, 250, .9);
   --backdrop-base: radial-gradient(130% 100% at 40% 26%, #28474a 0%, #1d3437 46%, #132628 100%);
-  --backdrop-page-base: radial-gradient(130% 110% at 34% 12%, #203c3f 0%, #182d30 52%, #112123 100%);
+  --backdrop-page-base: radial-gradient(130% 110% at 34% 12%, #0f1c1a 0%, #0b1715 52%, #081210 100%);
   --backdrop-far-1: #28464a;
   --backdrop-far-2: #22393d;
   --backdrop-mid-1: #37605f;
@@ -173,8 +165,8 @@
   --backdrop-line: rgba(180, 226, 216, .18);
 }
 :root[data-palette='violet'] {
-  --c-canvas: #f0eef6;
-  --c-soft: #e9e6f2;
+  --c-canvas: #e9e5f3;
+  --c-soft: #e4e0ef;
   --c-glass: rgba(251, 250, 254, .82);
   --c-glass-strong: rgba(255, 255, 255, .93);
   --c-line: #dfdbe9;
@@ -184,7 +176,7 @@
   --c-on-accent: #ffffff;
   --c-on-backdrop: rgba(250, 247, 255, .9);
   --backdrop-base: radial-gradient(130% 100% at 40% 26%, #faf9fd 0%, #f0eef6 46%, #e0dcee 100%);
-  --backdrop-page-base: radial-gradient(130% 110% at 34% 12%, #f8f7fc 0%, #ece9f4 52%, #dcd7ea 100%);
+  --backdrop-page-base: radial-gradient(130% 110% at 34% 12%, #edeaf6 0%, #e4e0f0 52%, #d6d0e6 100%);
   --backdrop-far-1: #eae6f3;
   --backdrop-far-2: #e4e0ef;
   --backdrop-mid-1: #d9d3ea;
@@ -206,7 +198,7 @@
   --c-on-accent: #14121e;
   --c-on-backdrop: rgba(245, 240, 255, .9);
   --backdrop-base: radial-gradient(130% 100% at 40% 26%, #3a3358 0%, #2b2542 46%, #1c1829 100%);
-  --backdrop-page-base: radial-gradient(130% 110% at 34% 12%, #332d4e 0%, #262040 52%, #181425 100%);
+  --backdrop-page-base: radial-gradient(130% 110% at 34% 12%, #14121e 0%, #100e18 52%, #0b0a12 100%);
   --backdrop-far-1: #332c50;
   --backdrop-far-2: #2c2645;
   --backdrop-mid-1: #473e6b;
@@ -217,8 +209,8 @@
   --backdrop-line: rgba(190, 178, 230, .18);
 }
 :root[data-palette='clay'] {
-  --c-canvas: #f7f1ec;
-  --c-soft: #f2e9e2;
+  --c-canvas: #efe7e0;
+  --c-soft: #e9e0d7;
   --c-glass: rgba(254, 251, 249, .82);
   --c-glass-strong: rgba(255, 255, 255, .93);
   --c-line: #e9ded5;
@@ -228,7 +220,7 @@
   --c-on-accent: #ffffff;
   --c-on-backdrop: rgba(255, 249, 244, .92);
   --backdrop-base: radial-gradient(130% 100% at 40% 26%, #fdfaf7 0%, #f7f0ea 46%, #eadfd5 100%);
-  --backdrop-page-base: radial-gradient(130% 110% at 34% 12%, #fbf8f5 0%, #f3ebe4 52%, #e6dbd1 100%);
+  --backdrop-page-base: radial-gradient(130% 110% at 34% 12%, #f2ece7 0%, #eae1d9 52%, #ddd0c4 100%);
   --backdrop-far-1: #f2e8e0;
   --backdrop-far-2: #ede1d8;
   --backdrop-mid-1: #e6d5c8;
@@ -250,7 +242,7 @@
   --c-on-accent: #1d1512;
   --c-on-backdrop: rgba(255, 243, 233, .9);
   --backdrop-base: radial-gradient(130% 100% at 40% 26%, #553726 0%, #40291d 46%, #291a12 100%);
-  --backdrop-page-base: radial-gradient(130% 110% at 34% 12%, #4b3222 0%, #38241a 52%, #251710 100%);
+  --backdrop-page-base: radial-gradient(130% 110% at 34% 12%, #1d1512 0%, #171110 52%, #100b09 100%);
   --backdrop-far-1: #4d3324;
   --backdrop-far-2: #422c1f;
   --backdrop-mid-1: #6b452c;
@@ -261,8 +253,8 @@
   --backdrop-line: rgba(226, 183, 150, .18);
 }
 :root[data-palette='graphite'] {
-  --c-canvas: #f1f2f3;
-  --c-soft: #e9eaec;
+  --c-canvas: #e8ebed;
+  --c-soft: #e3e6e9;
   --c-glass: rgba(251, 252, 252, .82);
   --c-glass-strong: rgba(255, 255, 255, .93);
   --c-line: #dfe1e3;
@@ -272,7 +264,7 @@
   --c-on-accent: #ffffff;
   --c-on-backdrop: rgba(252, 253, 254, .9);
   --backdrop-base: radial-gradient(130% 100% at 40% 26%, #fafbfb 0%, #f0f1f2 46%, #dfe2e4 100%);
-  --backdrop-page-base: radial-gradient(130% 110% at 34% 12%, #f8f9fa 0%, #ecedef 52%, #dbdee1 100%);
+  --backdrop-page-base: radial-gradient(130% 110% at 34% 12%, #eceeef 0%, #e4e7e9 52%, #d5d9dc 100%);
   --backdrop-far-1: #e8eaeb;
   --backdrop-far-2: #e2e4e6;
   --backdrop-mid-1: #d6d9dc;
@@ -294,7 +286,7 @@
   --c-on-accent: #14171a;
   --c-on-backdrop: rgba(246, 249, 251, .9);
   --backdrop-base: radial-gradient(130% 100% at 40% 26%, #333a41 0%, #262c31 46%, #171b1f 100%);
-  --backdrop-page-base: radial-gradient(130% 110% at 34% 12%, #2e353b 0%, #22272c 52%, #15191c 100%);
+  --backdrop-page-base: radial-gradient(130% 110% at 34% 12%, #14171a 0%, #101315 52%, #0b0e10 100%);
   --backdrop-far-1: #2e353b;
   --backdrop-far-2: #272d32;
   --backdrop-mid-1: #434b52;
@@ -317,7 +309,7 @@
     --c-on-accent: #0f1c1a;
     --c-on-backdrop: rgba(233, 255, 250, .9);
     --backdrop-base: radial-gradient(130% 100% at 40% 26%, #28474a 0%, #1d3437 46%, #132628 100%);
-    --backdrop-page-base: radial-gradient(130% 110% at 34% 12%, #203c3f 0%, #182d30 52%, #112123 100%);
+    --backdrop-page-base: radial-gradient(130% 110% at 34% 12%, #0f1c1a 0%, #0b1715 52%, #081210 100%);
     --backdrop-far-1: #28464a;
     --backdrop-far-2: #22393d;
     --backdrop-mid-1: #37605f;
@@ -339,7 +331,7 @@
     --c-on-accent: #14121e;
     --c-on-backdrop: rgba(245, 240, 255, .9);
     --backdrop-base: radial-gradient(130% 100% at 40% 26%, #3a3358 0%, #2b2542 46%, #1c1829 100%);
-    --backdrop-page-base: radial-gradient(130% 110% at 34% 12%, #332d4e 0%, #262040 52%, #181425 100%);
+    --backdrop-page-base: radial-gradient(130% 110% at 34% 12%, #14121e 0%, #100e18 52%, #0b0a12 100%);
     --backdrop-far-1: #332c50;
     --backdrop-far-2: #2c2645;
     --backdrop-mid-1: #473e6b;
@@ -361,7 +353,7 @@
     --c-on-accent: #1d1512;
     --c-on-backdrop: rgba(255, 243, 233, .9);
     --backdrop-base: radial-gradient(130% 100% at 40% 26%, #553726 0%, #40291d 46%, #291a12 100%);
-    --backdrop-page-base: radial-gradient(130% 110% at 34% 12%, #4b3222 0%, #38241a 52%, #251710 100%);
+    --backdrop-page-base: radial-gradient(130% 110% at 34% 12%, #1d1512 0%, #171110 52%, #100b09 100%);
     --backdrop-far-1: #4d3324;
     --backdrop-far-2: #422c1f;
     --backdrop-mid-1: #6b452c;
@@ -383,7 +375,7 @@
     --c-on-accent: #14171a;
     --c-on-backdrop: rgba(246, 249, 251, .9);
     --backdrop-base: radial-gradient(130% 100% at 40% 26%, #333a41 0%, #262c31 46%, #171b1f 100%);
-    --backdrop-page-base: radial-gradient(130% 110% at 34% 12%, #2e353b 0%, #22272c 52%, #15191c 100%);
+    --backdrop-page-base: radial-gradient(130% 110% at 34% 12%, #14171a 0%, #101315 52%, #0b0e10 100%);
     --backdrop-far-1: #2e353b;
     --backdrop-far-2: #272d32;
     --backdrop-mid-1: #434b52;
@@ -411,9 +403,6 @@
   --color-accent-soft: var(--c-accent-soft);
   --color-on-accent: var(--c-on-accent);
   --color-highlight: var(--c-highlight);
-  --shadow-panel: var(--elev-panel);
-  --shadow-card: var(--elev-card);
-  --shadow-float: var(--elev-float);
   --animate-rise: rise-in .48s var(--ease-soft) both;
   --animate-float: float-in .24s var(--ease-soft) both;
 }
@@ -457,7 +446,7 @@
   .prose ul, .prose ol { padding-left: 24px; list-style: revert; }
   .prose li + li { margin-top: 8px; }
   .prose input[type='checkbox'] { margin-right: 6px; }
-  .prose img { @apply my-8 mb-2.5 w-full cursor-zoom-in; height: auto; }
+  .prose img { @apply my-8 mb-2.5 w-full cursor-zoom-in rounded-card; height: auto; }
   .prose p:has(> img) + p > em:only-child { @apply block text-center text-xs text-muted; }
   .prose pre { @apply relative overflow-auto bg-surface px-[23px] pt-[46px] pb-[23px] text-[13px] leading-[1.8] shadow-card; }
   /* Shiki 使用双主题变量输出，显式消费它们才能显示代码高亮。 */
@@ -479,10 +468,10 @@
   .backdrop[data-backdrop='page'], .backdrop[data-backdrop='minimal'] { position: fixed; background: var(--backdrop-page-base); }
   .backdrop-depth { transition: transform .36s var(--ease-soft); will-change: transform; }
   .backdrop-enter { position: absolute; inset: 0; animation: backdrop-enter .5s var(--ease-soft) both; }
-  .backdrop-panel { position: relative; height: 100%; width: 100%; background: var(--backdrop-fill); box-shadow: var(--backdrop-shadow); }
+  /* 背景几何不使用投影：前后关系只由面板填充的明度差表达。 */
+  .backdrop-panel { position: relative; height: 100%; width: 100%; background: var(--backdrop-fill); }
   .backdrop-panel::after { content: ''; position: absolute; inset: 0; background: linear-gradient(140deg, var(--backdrop-edge), transparent 42%); }
-  .backdrop-panel-soft { box-shadow: var(--backdrop-shadow-soft); }
-  .backdrop-plate { position: absolute; inset: 0; background: var(--backdrop-plate); box-shadow: var(--backdrop-shadow-soft); animation: backdrop-enter .5s var(--ease-soft) both; }
+  .backdrop-plate { position: absolute; inset: 0; background: var(--backdrop-plate); animation: backdrop-enter .5s var(--ease-soft) both; }
   .backdrop-hairline { position: absolute; background: var(--backdrop-line); }
   .backdrop-grain { position: absolute; inset: 0; opacity: .07; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' opacity='.23' filter='url(%23n)'/%3E%3C/svg%3E"); }
   /* 几何切片：类型与标签面板、页头装饰使用的矩形切角。 */
@@ -515,14 +504,18 @@
   .popover-panel { animation: float-in .24s var(--ease-soft) both; transform-origin: top right; }
   .popover-panel[data-state='closing'] { animation: float-out .18s var(--ease-exit) both; }
 
-  /* ------- 卡片：错峰入场、悬停抬升与箭头位移 ------- */
+  /* ------- 卡片：错峰入场、悬停反馈与箭头位移 ------- */
   /* 默认内容可见；脚本把即将进入视口的卡片标记为 pending 后再播放一次入场。 */
   [data-motion='pending'] { opacity: 0; }
   [data-motion='in'] { animation: rise-in .48s var(--ease-soft) both; }
-  .lift { transition: transform .22s var(--ease-soft), box-shadow .22s var(--ease-soft), background-color .22s var(--ease-soft); }
-  .lift:hover, .lift:focus-within { transform: translateY(-6px); box-shadow: var(--elev-panel); }
-  .lift .lift-arrow { transition: transform .22s var(--ease-soft); }
-  .lift:hover .lift-arrow, .lift:focus-within .lift-arrow { transform: translate3d(3px, -3px, 0); }
+  /* 无阴影的悬停反馈：只用底色与文字变化表达层次，键盘焦点给同样的反馈。 */
+  .card-hover { transition: background-color .18s var(--ease-soft), border-color .18s var(--ease-soft); }
+  .card-hover:hover, .card-hover:focus-within { background-color: color-mix(in srgb, var(--c-surface) 76%, var(--c-soft)); }
+  /* 玻璃卡片悬停时加强材质，而不是换成不透明底色。 */
+  .glass-hover { transition: background-color .18s var(--ease-soft); }
+  .glass-hover:hover, .glass-hover:focus-within { background-color: var(--c-glass-strong); }
+  .card-hover .lift-arrow, .glass-hover .lift-arrow { transition: transform .22s var(--ease-soft); }
+  .card-hover:hover .lift-arrow, .card-hover:focus-within .lift-arrow, .glass-hover:hover .lift-arrow, .glass-hover:focus-within .lift-arrow { transform: translate3d(3px, -3px, 0); }
 }
 
 /* 可用性规则放在 utilities 层，防止 flex / inline-flex 覆盖隐藏状态。
