@@ -1,12 +1,12 @@
----
+﻿---
 import Base from '../layouts/Base.astro';
 import Panel from '../components/ui/Panel.astro';
 import Button from '../components/ui/Button.astro';
 ---
 <Base title="404 · 页面未找到" noindex translationUrl="/en/" backdrop="minimal">
   <section class="standard-page page-width pt-16 pb-24">
-    <Panel padding="lg" class="relative overflow-hidden text-center">
-      <span class="geo-slice" aria-hidden="true"></span>
+    <Panel padding="lg" class="relative text-center">
+      <span class="pointer-events-none absolute inset-0 overflow-hidden rounded-card" aria-hidden="true"><span class="geo-slice"></span></span>
       <p class="eyebrow relative">A SMALL DETOUR</p>
       <span class="error-number relative mt-6 block font-serif text-[110px] leading-none text-accent/30 md:text-[150px]">404</span>
       <h1 class="relative mt-4 font-serif text-[26px] font-normal md:text-[30px]">这一页，暂时留白。</h1>

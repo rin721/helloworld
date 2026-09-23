@@ -1,4 +1,10 @@
-@import 'tailwindcss';
+﻿@import 'tailwindcss' source(none);
+
+/* 只扫描应用源码：文档、测试与校验脚本里的类名字符串不应进入产物 CSS。 */
+@source "../components";
+@source "../layouts";
+@source "../pages";
+@source "../scripts";
 
 /* 深色变体与脚本写入的 data-resolved-theme 同步。
    语义颜色本身已经随主题切换，这里只服务少数需要工具类分支的细节。 */
@@ -29,7 +35,7 @@
   --c-glass: rgba(250, 253, 255, .82);
   --c-glass-strong: rgba(255, 255, 255, .93);
   --c-ink: #172330;
-  --c-muted: #596e88;
+  --c-muted: #536880;
   --c-faint: #78889b;
   --c-line: #dde5ed;
   --c-line-strong: #c6d4e2;
@@ -387,7 +393,7 @@
   }
 }
 
-/* 把语义变量暴露成 Tailwind 颜色、阴影与缓动，组件用 bg-surface、text-ink、shadow-panel 等工具类消费。 */
+/* 把语义变量暴露成 Tailwind 颜色与缓动，组件用 bg-surface、text-ink、rounded-card 等工具类消费；站点不使用阴影。 */
 @theme inline {
   --color-canvas: var(--c-canvas);
   --color-surface: var(--c-surface);
@@ -448,7 +454,7 @@
   .prose input[type='checkbox'] { margin-right: 6px; }
   .prose img { @apply my-8 mb-2.5 w-full cursor-zoom-in rounded-card; height: auto; }
   .prose p:has(> img) + p > em:only-child { @apply block text-center text-xs text-muted; }
-  .prose pre { @apply relative overflow-auto bg-surface px-[23px] pt-[46px] pb-[23px] text-[13px] leading-[1.8] shadow-card; }
+  .prose pre { @apply relative overflow-auto rounded-card bg-surface px-[23px] pt-[46px] pb-[23px] text-[13px] leading-[1.8]; }
   /* Shiki 使用双主题变量输出，显式消费它们才能显示代码高亮。 */
   .astro-code, .astro-code span { color: var(--shiki-light); background-color: var(--shiki-light-bg); }
   :root[data-resolved-theme='dark'] .astro-code, :root[data-resolved-theme='dark'] .astro-code span { color: var(--shiki-dark); background-color: var(--shiki-dark-bg); }
@@ -508,14 +514,8 @@
   /* 默认内容可见；脚本把即将进入视口的卡片标记为 pending 后再播放一次入场。 */
   [data-motion='pending'] { opacity: 0; }
   [data-motion='in'] { animation: rise-in .48s var(--ease-soft) both; }
-  /* 无阴影的悬停反馈：只用底色与文字变化表达层次，键盘焦点给同样的反馈。 */
-  .card-hover { transition: background-color .18s var(--ease-soft), border-color .18s var(--ease-soft); }
-  .card-hover:hover, .card-hover:focus-within { background-color: color-mix(in srgb, var(--c-surface) 76%, var(--c-soft)); }
-  /* 玻璃卡片悬停时加强材质，而不是换成不透明底色。 */
-  .glass-hover { transition: background-color .18s var(--ease-soft); }
-  .glass-hover:hover, .glass-hover:focus-within { background-color: var(--c-glass-strong); }
-  .card-hover .lift-arrow, .glass-hover .lift-arrow { transition: transform .22s var(--ease-soft); }
-  .card-hover:hover .lift-arrow, .card-hover:focus-within .lift-arrow, .glass-hover:hover .lift-arrow, .glass-hover:focus-within .lift-arrow { transform: translate3d(3px, -3px, 0); }
+  /* 无阴影的悬停反馈由工具类表达（utilities 层优先于本层，规则不能在这里覆盖 bg-surface）。 */
+
 }
 
 /* 可用性规则放在 utilities 层，防止 flex / inline-flex 覆盖隐藏状态。
@@ -580,6 +580,6 @@ html:not([data-navigation='soft']) .header-inner { animation: header-enter .46s 
 /* 手动切换主题时的短暂过渡：只在这 320ms 内生效，不给全站留下常驻 transition。 */
 @media (prefers-reduced-motion: no-preference) {
   html.theme-anim, html.theme-anim *, html.theme-anim *::before, html.theme-anim *::after {
-    transition: background-color .3s var(--ease-soft), color .3s var(--ease-soft), border-color .3s var(--ease-soft), box-shadow .3s var(--ease-soft), transform .22s var(--ease-soft) !important;
+    transition: background-color .3s var(--ease-soft), color .3s var(--ease-soft), border-color .3s var(--ease-soft), transform .22s var(--ease-soft) !important;
   }
 }

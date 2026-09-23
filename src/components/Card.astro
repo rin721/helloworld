@@ -1,4 +1,4 @@
----
+﻿---
 /** 内容卡片：单列内容流的基本单元。圆角、无阴影，悬停只改变底色、标题颜色与封面缩放。 */
 import { Image } from 'astro:assets';
 import { labels, formatDate } from '../config';
@@ -45,7 +45,7 @@ const kindLabel = featured ? t.featured : post.data.layout === 'gallery' ? t.gal
         {post.data.tags.map(tag => <Tag href={`/${locale}/tags/${encodeURIComponent(tag)}/`}>#{tag}</Tag>)}
         {post.data.draft && <Tag variant="solid">{t.draft}</Tag>}
       </div>
-      <a class="card-arrow lift-arrow grid h-9 w-9 shrink-0 place-items-center rounded-control bg-soft text-accent" href={post.url} aria-label={`${t.more}：${post.data.title}`}>
+      <a class="card-arrow grid h-9 w-9 shrink-0 place-items-center rounded-control bg-soft text-accent transition-transform duration-200 ease-soft group-hover:translate-x-[3px] group-hover:-translate-y-[3px] group-focus-within:translate-x-[3px] group-focus-within:-translate-y-[3px]" href={post.url} aria-label={`${t.more}：${post.data.title}`}>
         <Icon name="arrow-up-right" size={16} />
       </a>
     </div>

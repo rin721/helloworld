@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+﻿import { test, expect, type Page } from '@playwright/test';
 import sharp from 'sharp';
 import { site } from '../../src/config';
 
@@ -232,7 +232,8 @@ test('减少动效直接呈现静态构图，深色模式逐层配置背景', as
   expect(dark.base).not.toBe(light.base);
   expect(new Set(dark.fills).size).toBeGreaterThanOrEqual(4);
   expect(dark.fills).not.toEqual(light.fills);
-  expect(dark.shadows.every(shadow => shadow !== 'none')).toBe(true);
+  // 卡片语言要求全站无阴影：深色下也不允许用投影分层。
+  expect(dark.shadows.every(shadow => shadow === 'none')).toBe(true);
 });
 
 test('背景层次在真实像素上可辨认，且文字下方没有明显交界', async ({ page }) => {
@@ -718,8 +719,9 @@ test('页头随滚动隐藏，向上滚动或回到顶部时滑出', async ({ pa
   expect(pinned.top).toBe(0);
   // 强调外观来自单独一层的淡入：透明度接近 1，并带阴影。
   expect(pinned.surface).toBeGreaterThan(0.95);
-  const surfaceShadow = await page.locator('[data-header-surface]').evaluate(el => getComputedStyle(el).boxShadow);
-  expect(surfaceShadow).not.toBe('none');
+  // 吸附状态不再用阴影，改用底边界与更实的玻璃底表达。
+  expect(await page.locator('[data-header-surface]').evaluate(el => getComputedStyle(el).boxShadow)).toBe('none');
+  expect(await page.locator('[data-header-surface]').evaluate(el => getComputedStyle(el).borderBottomWidth)).toBe('1px');
   // 回到顶部恢复普通贴顶状态。
   await page.evaluate(() => scrollTo({ top: 0, behavior: 'instant' }));
   await expect(header).toHaveAttribute('data-header-state', 'top');
@@ -951,14 +953,15 @@ test('五份配色在浅色与深色下都满足文字与强调色的对比度�
   }
 });
 
-test('默认蓝灰配色与既有取值一致，不产生视觉回归', async ({ page }) => {
+test('默认蓝灰配色沿用既有强调色，底色按新的明度阶梯', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto('/zh/');
   await page.evaluate(() => { localStorage.clear(); });
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('data-palette', 'slate');
-  const light = await resolveColors(page, ['var(--c-canvas)', 'var(--c-accent)', '#eef3f8', '#476282']);
-  expect(light['var(--c-canvas)']).toEqual(light['#eef3f8']);
+  // 圆角与去阴影这一轮刻意调整了底色阶梯（页面底色压深一档），强调色保持不变。
+  const light = await resolveColors(page, ['var(--c-canvas)', 'var(--c-accent)', '#e8eef5', '#476282']);
+  expect(light['var(--c-canvas)']).toEqual(light['#e8eef5']);
   expect(light['var(--c-accent)']).toEqual(light['#476282']);
   await setTheme(page, 'zh', 'dark');
   const dark = await resolveColors(page, ['var(--c-canvas)', 'var(--c-accent)', '#101a24', '#b2c9e1']);
@@ -1078,6 +1081,122 @@ test('设置入口使用色彩板图标，并且颜料点跟随当前配色', as
   expect(await countAccentPixels()).toBeGreaterThan(3);
 });
 
+test('全站不使用阴影，浮层与模态靠底色与 1px 边界分层', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  const noShadow = async (selector: string) => {
+    const value = await page.locator(selector).first().evaluate(el => getComputedStyle(el).boxShadow);
+    expect(value, `${selector} 不应有阴影`).toBe('none');
+  };
+  await page.goto('/zh/');
+  await noShadow('.entry-card');
+  await noShadow('[data-backdrop="home"] .backdrop-panel');
+  await noShadow('[data-header-surface]');
+  await noShadow('.card-arrow');
+  await page.goto('/zh/archive/');
+  await noShadow('.archive-group');
+  await page.goto('/zh/tags/');
+  await noShadow('.taxonomy-grid > *');
+  await page.goto('/zh/search/');
+  await noShadow('[data-search-form] > div');
+  // 浮层与模态：没有阴影，但有 1px 边界保持可辨。
+  await page.goto('/zh/');
+  await page.getByRole('button', { name: '标签', exact: true }).click();
+  const panel = page.locator('#tag-filter-panel');
+  await expect(panel).toBeVisible();
+  expect(await panel.evaluate(el => getComputedStyle(el).boxShadow)).toBe('none');
+  expect(await panel.evaluate(el => getComputedStyle(el).borderTopWidth)).toBe('1px');
+  await page.keyboard.press('Escape');
+  await page.goto('/zh/posts/blue-hour/');
+  await page.getByRole('button', { name: 'English translation unavailable' }).click();
+  const modalPanel = page.locator('#translation-modal [data-modal-panel]');
+  await expect(modalPanel).toBeVisible();
+  expect(await modalPanel.evaluate(el => getComputedStyle(el).boxShadow)).toBe('none');
+  expect(await modalPanel.evaluate(el => getComputedStyle(el).borderTopWidth)).toBe('1px');
+});
+
+test('圆角刻度统一，卡片裁切不伤焦点轮廓', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto('/zh/');
+  const radius = async (selector: string) => page.locator(selector).first().evaluate(el => getComputedStyle(el).borderRadius);
+  expect(await radius('.entry-card')).toBe('16px');
+  expect(await radius('.card-image-link')).toContain('16px');
+  expect(await radius('.card-arrow')).toBe('8px');
+  expect(await radius('.tag-list a')).toBe('6px');
+  // 卡片根不裁切、封面容器裁切，因此焦点轮廓不会被 overflow 截断。
+  expect(await page.locator('.entry-card').first().evaluate(el => getComputedStyle(el).overflow)).toBe('visible');
+  expect(await page.locator('.entry-card .card-image-link').first().evaluate(el => getComputedStyle(el).overflow)).toBe('hidden');
+  await page.goto('/zh/tags/');
+  const card = page.locator('.taxonomy-grid > *').first();
+  expect(await card.evaluate(el => getComputedStyle(el).overflow)).toBe('visible');
+  const link = card.locator('a').first();
+  await link.focus();
+  const focus = await link.evaluate(el => {
+    const rect = el.getBoundingClientRect();
+    const cardRect = el.closest('.taxonomy-grid > *')!.getBoundingClientRect();
+    return {
+      outline: getComputedStyle(el).outlineWidth,
+      inside: rect.top >= cardRect.top - 1 && rect.bottom <= cardRect.bottom + 1 && rect.left >= cardRect.left - 1 && rect.right <= cardRect.right + 1,
+    };
+  });
+  expect(focus.outline).not.toBe('0px');
+  expect(focus.inside).toBe(true);
+});
+
+test('无阴影后卡片与页面底色仍保持可辨的明度差', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  const toLightness = (rgb: number[]) => {
+    const channel = (value: number) => { const v = value / 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; };
+    const y = 0.2126 * channel(rgb[0]) + 0.7152 * channel(rgb[1]) + 0.0722 * channel(rgb[2]);
+    return y > 0.008856 ? 116 * Math.cbrt(y) - 16 : 903.3 * y;
+  };
+  for (const mode of ['light', 'dark'] as const) {
+    for (const palette of ['slate', 'jade', 'violet', 'clay', 'graphite'] as const) {
+      await page.goto('/zh/archive/');
+      await page.evaluate(([m, p]) => { localStorage.setItem('theme', m); localStorage.setItem('palette', p); }, [mode, palette] as const);
+      await page.reload();
+      await expect(page.locator('html')).toHaveAttribute('data-palette', palette);
+      await page.waitForTimeout(350);
+      const box = await page.locator('.archive-group').first().boundingBox();
+      const shot = await page.screenshot({ animations: 'disabled' });
+      const { data, info } = await sharp(shot).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+      const at = (x: number, y: number) => { const i = (Math.round(y) * info.width + Math.round(x)) * info.channels; return [data[i], data[i + 1], data[i + 2]]; };
+      const cardLightness = toLightness(at(box!.x + box!.width / 2, box!.y + 20));
+      const pageLightness = toLightness(at(box!.x / 2, box!.y + 20));
+      expect(cardLightness - pageLightness, `${palette}/${mode} 卡片与页面明度差 = ${(cardLightness - pageLightness).toFixed(1)}`).toBeGreaterThanOrEqual(4);
+    }
+  }
+});
+
+test('悬停与键盘焦点给出一致的卡片反馈', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto('/zh/');
+  const card = page.locator('.entry-list .entry-card').first();
+  const title = card.locator('h2 a');
+  const cover = card.locator('.card-image-link img');
+  const accent = (await resolveColors(page, ['var(--c-accent)']))['var(--c-accent)'];
+  const accentCss = `rgb(${accent.r}, ${accent.g}, ${accent.b})`;
+  const snapshot = async () => ({
+    background: await card.evaluate(el => getComputedStyle(el).backgroundColor),
+    title: await title.evaluate(el => getComputedStyle(el).color),
+    scale: await cover.evaluate(el => getComputedStyle(el).scale),
+  });
+  const idle = await snapshot();
+  await card.hover();
+  await page.waitForTimeout(320);
+  const hovered = await snapshot();
+  expect(hovered.background).not.toBe(idle.background);
+  expect(hovered.title).toBe(accentCss);
+  expect(hovered.scale).not.toBe(idle.scale);
+  // 移开指针后用键盘聚焦，反馈应当一致。
+  await page.mouse.move(5, 5);
+  await page.waitForTimeout(320);
+  await title.focus();
+  await page.waitForTimeout(320);
+  const focused = await snapshot();
+  expect(focused.background).not.toBe(idle.background);
+  expect(focused.title).toBe(accentCss);
+  expect(focused.scale).not.toBe(idle.scale);
+});
 test('首页到详情、分页与类型筛选形成完整浏览路径', async ({ page }) => {
   await page.goto('/zh/');
   await expect(page.locator('.hero h1')).toHaveText(`${site.name}.`);

@@ -1,4 +1,4 @@
----
+﻿---
 /** 搜索输入：图标、清空按钮与提交按钮共用一套状态样式，清空按钮由搜索控制器显示。 */
 import Icon from './Icon.astro';
 import IconButton from './IconButton.astro';
@@ -7,7 +7,7 @@ const { id, label, placeholder, value = '', clearLabel, submitLabel } = Astro.pr
 ---
 <form id="search-form" role="search" class="w-full" data-search-form>
   <label for={id} class="sr-only">{label}</label>
-  <div class="flex items-center gap-2 border border-transparent bg-surface px-4 shadow-card transition-shadow duration-200 ease-soft focus-within:border-line-strong focus-within:shadow-panel">
+  <div class="flex items-center gap-2 rounded-control border border-transparent bg-surface px-4 transition-colors duration-200 ease-soft focus-within:border-line-strong">
     <Icon name="search" size={18} class="shrink-0 text-faint" />
     <input
       id={id}

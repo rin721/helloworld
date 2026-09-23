@@ -74,10 +74,14 @@ for (const file of files.filter(f => f.endsWith('.js') && f.includes(`${path.sep
 }
 
 // 样式检查：语义工具类必须真的产出，被替代的旧组件样式必须已经删除。
-const css = (await Promise.all(files.filter(f => f.endsWith('.css')).map(f => readFile(f, 'utf8')))).join('\n');
-for (const [pattern, label] of [[/\.bg-surface\b/, '语义颜色工具类 bg-surface'], [/\.page-width\b/, '页面容器工具类 page-width'], [/\.shadow-card\b/, '语义阴影工具类 shadow-card']] as const) {
+// 只看应用自身的 CSS：Pagefind 自带的界面样式不属于本次卡片语言。
+const css = (await Promise.all(files.filter(f => f.endsWith('.css') && !f.includes(`${path.sep}pagefind${path.sep}`)).map(f => readFile(f, 'utf8')))).join('\n');
+for (const [pattern, label] of [[/\.bg-surface\b/, '语义颜色工具类 bg-surface'], [/\.page-width\b/, '页面容器工具类 page-width'], [/\.rounded-card\b/, '圆角工具类 rounded-card'], [/\.rounded-control\b/, '圆角工具类 rounded-control']] as const) {
   if (!pattern.test(css)) errors.push(`构建产物缺少${label}`);
 }
+// 卡片语言：全站不使用阴影，产物里不允许出现任何实际的 box-shadow 声明（Preflight 的 box-shadow:none 除外）。
+if (/box-shadow:\s*(?!none)/.test(css)) errors.push('构建产物仍声明了 box-shadow，卡片语言要求全站无阴影');
+if (/--elev-(?:panel|card|float)\s*:/.test(css)) errors.push('构建产物仍包含旧的阴影令牌 --elev-*');
 for (const legacy of ['entry-card', 'filter-bar', 'tag-menu', 'about-art', 'search-field', 'type-filters', 'primary-link', 'hero-panel', 'hairline']) {
   if (new RegExp(`\\.${legacy}\\s*[,{]`).test(css)) errors.push(`构建产物仍包含被替代的旧样式 .${legacy}`);
 }
@@ -89,7 +93,7 @@ for (const palette of ['jade', 'violet', 'clay', 'graphite']) {
 if (!css.includes('--c-on-backdrop')) errors.push('构建产物缺少背景水印文字令牌');
 
 // Tailwind 优先：关键页面的布局必须真的由工具类承担，而不是靠遗留全局样式。
-const utility = /\b(?:flex|grid|gap-\d|w-full|mx-auto|p[trblxy]?-\d|m[trblxy]?-\d|text-\[|bg-(?:surface|soft|glass|canvas|accent)|shadow-(?:card|panel|float)|md:|lg:)/;
+const utility = /\b(?:flex|grid|gap-\d|w-full|mx-auto|p[trblxy]?-\d|m[trblxy]?-\d|text-\[|bg-(?:surface|soft|glass|canvas|accent)|rounded-(?:card|control|chip)|md:|lg:)/;
 for (const page of ['zh/index.html', 'zh/archive/index.html', 'zh/search/index.html', 'zh/about/index.html']) {
   const $ = await html(path.join(root, page));
   const hits = $('[class]').toArray().filter(el => utility.test($(el).attr('class') ?? '')).length;

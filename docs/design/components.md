@@ -1,4 +1,4 @@
-# UI 组件与交互机制
+﻿# UI 组件与交互机制
 
 这份文档是公共组件与交互控制器的权威来源。视觉方向见 [UI/UX 规范](ui-ux.md)，内容格式见 [内容设计](../../02-content-design.md)。
 
@@ -18,7 +18,7 @@
 | `Icon` | `name`、`size`、`strokeWidth` | 24 网格描边图标，定义集中在 `icons.ts`，颜色继承 `currentColor`；`palette` 是色彩板轮廓加四个颜料点，颜料点填 `var(--c-accent)`，图标本身就显示当前配色 |
 | `Button` | `variant`（primary／quiet／outline／plain）、`size`（sm／md）、`href`、`icon`、`iconPosition` | 有 `href` 渲染为链接，否则渲染为按钮；`data-state="busy"` 表达处理中 |
 | `IconButton` | `label`（必填）、`icon`、`variant`、`size`、`type` | 只有一个图标的按钮，`label` 同时用于 `aria-label` 与 `title` |
-| `Panel` | `as`、`variant`（surface／glass／soft／plain）、`padding`（none／sm／md／lg）、`lift` | 站点的基本表面：直角矩形、柔和阴影、可选半透明材质与悬停抬升 |
+| `Panel` | `as`、`variant`（surface／glass／soft／plain）、`padding`（none／sm／md／lg）、`lift` | 站点的基本表面：`rounded-card`、无阴影；`lift` 只用底色变化做悬停与 `focus-within` 反馈（玻璃变体用 `bg-glass-strong`） |
 | `Tag` | `href`、`variant`（quiet／solid） | 标签与元信息芯片 |
 | `SegmentedControl` | `name`、`legend`、`options`、`value`、`variant`（block／compact） | `role="radiogroup"` 的互斥选择，替代系统下拉框；`compact` 只显示图标，名称放进 `sr-only`，用于页头 |
 | `SearchInput` | `id`、`label`、`placeholder`、`clearLabel`、`submitLabel` | 带图标、清空与提交按钮的搜索输入 |
@@ -75,7 +75,7 @@
 | --- | --- |
 | 背景分层视差 | 指针与滚动位移相加后整体不超过 16px（远层 8px、中层 16px）；触屏、减少动效、离开视口或页面切到后台时暂停并归位；正文区域不参与位移 |
 | 卡片入场 | 480ms 淡入与 16px 位移，同组错峰 60ms、累计不超过 240ms；进入视口只播放一次，结束后交还样式表 |
-| 卡片悬停 | 220ms、最多 6px 抬升，配合表面变化与箭头位移；键盘焦点给出同样反馈 |
+| 卡片悬停 | 180ms 底色变化 + 标题转强调色 + 封面 1.03 倍放大（`group-hover` / `group-focus-within`），箭头位移 3px；无位移无投影 |
 | 浮层与模态层 | 打开 240ms 淡入、短位移与轻微缩放，关闭 180ms；快速重复操作有明确状态 |
 | 页头隐藏／滑出 | 隐藏 260ms 加速离开、滑出 420ms 减速并轻微回弹；`translate`／`scale` 过渡可被方向变化中断；强调表面用透明度 360ms 淡入 |
 | 页头首次进入 | 460ms 淡入与 10px 归位，只作用于内层内容，不与状态切换的 transform 抢属性；软导航不重播 |

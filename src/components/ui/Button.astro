@@ -1,4 +1,4 @@
----
+﻿---
 /**
  * 按钮：链接和按钮共用一套外观。
  * variant 决定表面，size 决定体量，`data-state` 由控制器写入以表达加载或成功等状态。
@@ -30,7 +30,7 @@ const sizes: Record<Size, string> = {
   md: 'min-h-[46px] px-6 py-3 text-[12px]',
 };
 const classes = [
-  'inline-flex items-center justify-center gap-3 tracking-[.12em] uppercase',
+  'inline-flex items-center justify-center gap-3 rounded-control tracking-[.12em] uppercase',
   'transition-[background-color,color,border-color,transform] duration-200 ease-soft',
   'data-[state=busy]:opacity-60',
   surface[variant],

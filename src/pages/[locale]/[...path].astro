@@ -1,4 +1,4 @@
----
+﻿---
 import Base from '../../layouts/Base.astro';
 import Hero from '../../components/Hero.astro';
 import Card from '../../components/Card.astro';
@@ -39,12 +39,12 @@ const kinds = ['article', 'diary', 'note'] as const;
       </p>
     </div>
 
-    <div class="filter-bar mb-8 flex flex-wrap items-center justify-between gap-4 bg-soft px-5 py-3">
+    <div class="filter-bar mb-8 flex flex-wrap items-center justify-between gap-4 rounded-card bg-soft px-5 py-3">
       <nav class="type-filters flex flex-wrap items-center gap-1 text-[12px] text-muted" aria-label={t.types}>
-        <a class:list={['px-4 py-2 transition-colors duration-200 ease-soft', !filter ? 'bg-surface text-ink shadow-card' : 'hover:bg-surface hover:text-ink']} href={`/${locale}/#journal`} aria-current={!filter ? 'page' : undefined}>{t.all}</a>
+        <a class:list={['px-4 py-2 transition-colors duration-200 ease-soft', !filter ? 'rounded-control bg-surface text-ink' : 'rounded-control hover:bg-surface hover:text-ink']} href={`/${locale}/#journal`} aria-current={!filter ? 'page' : undefined}>{t.all}</a>
         {kinds.map(kind => (
           <a
-            class:list={['px-4 py-2 transition-colors duration-200 ease-soft', filter?.type === 'types' && filter.value === kind ? 'bg-surface text-ink shadow-card' : 'hover:bg-surface hover:text-ink']}
+            class:list={['px-4 py-2 transition-colors duration-200 ease-soft', filter?.type === 'types' && filter.value === kind ? 'rounded-control bg-surface text-ink' : 'rounded-control hover:bg-surface hover:text-ink']}
             href={`/${locale}/types/${kind}/`}
             aria-current={filter?.type === 'types' && filter.value === kind ? 'page' : undefined}
           >{t[kind]}</a>

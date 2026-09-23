@@ -1,4 +1,4 @@
----
+﻿---
 import { render } from 'astro:content';
 import { Image } from 'astro:assets';
 import Base from '../../../layouts/Base.astro';
@@ -49,8 +49,8 @@ const outlineId = 'article-outline-mobile';
   <article class="group pb-20 md:pb-28" data-layout={post.data.layout} data-kind={post.data.kind} data-pagefind-body data-pagefind-filter={`type:${post.data.kind}`}>
     <header class="page-width pt-10 md:pt-14">
       {/* 元信息条：返回入口、类型、日期、草稿与译文入口。整条是导航性信息，不进入搜索索引。 */}
-      <Panel variant="glass" padding="sm" class="relative flex flex-wrap items-center gap-x-4 gap-y-2 overflow-hidden md:gap-x-6" data-pagefind-ignore>
-        <span class="geo-slice w-[34%] md:w-[20%]" aria-hidden="true"></span>
+      <Panel variant="glass" padding="sm" class="relative flex flex-wrap items-center gap-x-4 gap-y-2 md:gap-x-6" data-pagefind-ignore>
+        <span class="pointer-events-none absolute inset-0 overflow-hidden rounded-card" aria-hidden="true"><span class="geo-slice w-[34%] md:w-[20%]"></span></span>
         <a class="relative inline-flex items-center gap-2 text-[11px] tracking-[.14em] text-muted uppercase transition-colors duration-200 ease-soft hover:text-accent" href={`/${locale}/#journal`}>
           <Icon name="arrow-left" size={14} />
           {t.journal}
@@ -69,8 +69,8 @@ const outlineId = 'article-outline-mobile';
 
       {/* 标题面板：大标题保留 data-pagefind-meta="title"，搜索结果的标题依赖它，
           因此只有面板内的元信息与标签被标记为忽略，标题本身仍然参与索引。 */}
-      <Panel padding="lg" class="relative mt-4 overflow-hidden md:mt-5">
-        <span class="geo-slice" aria-hidden="true"></span>
+      <Panel padding="lg" class="relative mt-4 md:mt-5">
+        <span class="pointer-events-none absolute inset-0 overflow-hidden rounded-card" aria-hidden="true"><span class="geo-slice"></span></span>
         <p class="relative hidden font-serif text-[22px] leading-none tracking-[.02em] text-accent group-data-[kind=diary]:block md:text-[26px]">{dateText}</p>
         <h1 class="relative mt-3 max-w-[860px] font-serif text-[32px] leading-[1.2] font-normal md:text-[44px] lg:text-[50px]" data-pagefind-meta="title">{post.data.title}</h1>
         {post.excerpt && <p class="article-deck relative mt-5 max-w-[700px] font-serif text-[18px] leading-[1.8] text-muted md:text-[20px]">{post.excerpt}</p>}
@@ -84,7 +84,7 @@ const outlineId = 'article-outline-mobile';
     {/* 封面：保留 figure.article-cover，图片查看器依赖它收集 .article-cover img。
         图文模板把封面作为限高的横幅；文字模板若带封面则按原始比例完整呈现。 */}
     {coverVisible && cover && (
-      <Panel as="figure" padding="none" class="article-cover page-width mt-6 overflow-hidden md:mt-8">
+      <Panel as="figure" padding="none" class="article-cover page-width mt-6 md:mt-8">
         <Image
           src={cover}
           alt={post.data.coverAlt ?? post.data.title}
@@ -103,8 +103,8 @@ const outlineId = 'article-outline-mobile';
           桌面用显式网格位置把它放到右栏，不依赖 order 改变可访问顺序。 */}
       {toc.length > 0 && (
         <aside class="toc hidden md:sticky md:top-24 md:col-start-2 md:row-start-1 md:block md:self-start" data-pagefind-ignore>
-          <Panel variant="glass" padding="md" class="relative overflow-hidden group-data-[kind=note]:bg-surface group-data-[kind=note]:shadow-panel">
-            <span class="geo-slice w-[30%]" aria-hidden="true"></span>
+          <Panel variant="glass" padding="md" class="relative group-data-[kind=note]:bg-surface">
+            <span class="pointer-events-none absolute inset-0 overflow-hidden rounded-card" aria-hidden="true"><span class="geo-slice w-[30%]"></span></span>
             <p class="panel-title relative text-[19px] md:text-[21px]">{t.contents}</p>
             <nav class="relative mt-4 flex flex-col" aria-label={t.contents}>
               {toc.map(heading => <a class:list={[outlineLink, heading.depth === 3 && 'ml-3 opacity-80']} href={`#${heading.slug}`}>{heading.text}</a>)}
@@ -117,8 +117,8 @@ const outlineId = 'article-outline-mobile';
           无脚本时区域保持展开、内容仍然可读；折叠由脚本控制，因此只有 html.js 下的
           data-state="closed" 才把链接真正隐藏（不脚本时保持可见可读）。 */}
       {toc.length > 0 && (
-        <Panel variant="glass" padding="md" class="relative overflow-hidden md:hidden group-data-[kind=note]:bg-surface group-data-[kind=note]:shadow-panel" data-pagefind-ignore>
-          <span class="geo-slice w-[38%]" aria-hidden="true"></span>
+        <Panel variant="glass" padding="md" class="relative md:hidden group-data-[kind=note]:bg-surface " data-pagefind-ignore>
+          <span class="pointer-events-none absolute inset-0 overflow-hidden rounded-card" aria-hidden="true"><span class="geo-slice w-[38%]"></span></span>
           <Disclosure id={outlineId} summary={t.contents} variant="block" class="relative">
             <nav class="toc flex flex-col" aria-label={t.contents}>
               {toc.map(heading => <a class:list={[outlineLink, heading.depth === 3 && 'ml-3 opacity-80']} href={`#${heading.slug}`}>{heading.text}</a>)}
@@ -144,8 +144,8 @@ const outlineId = 'article-outline-mobile';
 
     {/* 结束语：靠半透明表面与留白收束正文。 */}
     <footer class="article-ending page-width mt-12 md:mt-16" data-pagefind-ignore>
-      <Panel variant="glass" padding="md" class="relative overflow-hidden md:p-8">
-        <span class="geo-slice w-[26%] md:w-[18%]" aria-hidden="true"></span>
+      <Panel variant="glass" padding="md" class="relative md:p-8">
+        <span class="pointer-events-none absolute inset-0 overflow-hidden rounded-card" aria-hidden="true"><span class="geo-slice w-[26%] md:w-[18%]"></span></span>
         <p class="relative flex items-center gap-3 font-serif text-[15px] text-ink">
           <span class="text-accent" aria-hidden="true">✳</span>
           {endingText}
@@ -160,10 +160,10 @@ const outlineId = 'article-outline-mobile';
     {/* 相邻文章：两个 Panel 以表面与阴影分组，不使用描边分隔。 */}
     <nav class="sibling-nav page-width mt-4 grid gap-4 md:mt-5 md:grid-cols-2 md:gap-5" aria-label={adjacentLabel} data-pagefind-ignore>
       {previous && (
-        <Panel padding="none" lift class="relative overflow-hidden">
+        <Panel padding="none" lift class="group relative">
           <a class="flex h-full flex-col gap-2 p-6" href={previous.url}>
             <span class="eyebrow flex items-center gap-2">
-              <Icon name="arrow-left" size={13} class="lift-arrow" />
+              <Icon name="arrow-left" size={13} class="transition-transform duration-200 ease-soft group-hover:-translate-x-[3px] group-hover:-translate-y-[3px] group-focus-within:-translate-x-[3px] group-focus-within:-translate-y-[3px]" />
               {t.relatedPrevious}
             </span>
             <strong class="panel-title text-[19px] break-words md:text-[21px]">{previous.data.title}</strong>
@@ -171,11 +171,11 @@ const outlineId = 'article-outline-mobile';
         </Panel>
       )}
       {next && (
-        <Panel padding="none" lift class={previous ? 'relative overflow-hidden' : 'relative overflow-hidden md:col-start-2'}>
+        <Panel padding="none" lift class:list={['group relative', !previous && 'md:col-start-2']}>
           <a class="flex h-full flex-col items-end gap-2 p-6 text-right" href={next.url}>
             <span class="eyebrow flex items-center gap-2">
               {t.relatedNext}
-              <Icon name="arrow-right" size={13} class="lift-arrow" />
+              <Icon name="arrow-right" size={13} class="transition-transform duration-200 ease-soft group-hover:translate-x-[3px] group-hover:-translate-y-[3px] group-focus-within:translate-x-[3px] group-focus-within:-translate-y-[3px]" />
             </span>
             <strong class="panel-title text-[19px] break-words md:text-[21px]">{next.data.title}</strong>
           </a>

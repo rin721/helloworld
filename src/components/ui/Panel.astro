@@ -20,7 +20,10 @@ const surfaces = {
   plain: 'bg-transparent',
 }[variant];
 const paddings = { none: '', sm: 'p-4', md: 'p-6', lg: 'p-7 md:p-10' }[padding];
-const hover = lift ? (variant === 'glass' ? 'glass-hover' : 'card-hover') : '';
+/* 悬停反馈必须用工具类：utilities 层优先于组件层，写在 global.css 里会被 bg-surface 盖掉。 */
+const hoverSurface = 'hover:bg-[color-mix(in_srgb,var(--c-surface)_76%,var(--c-soft))] focus-within:bg-[color-mix(in_srgb,var(--c-surface)_76%,var(--c-soft))]';
+const hoverGlass = 'hover:bg-glass-strong focus-within:bg-glass-strong';
+const hover = lift ? ['transition-colors duration-200 ease-soft', variant === 'glass' ? hoverGlass : hoverSurface].join(' ') : '';
 ---
 <Tag class={[surfaces, paddings, hover, 'relative rounded-card', className].join(' ')} {...rest}>
   <slot />

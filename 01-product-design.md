@@ -32,4 +32,4 @@
 
 本地应用、静态产物、工程检查、浏览器证据和维护文档属于本次交付。线上账号绑定、真实域名和发布状态独立记录。
 
-内容协议见 [内容设计](02-content-design.md)，视觉与交互见 [UI/UX](docs/design/ui-ux.md)，验证结果见 [验收记录](docs/acceptance.md)。
+内容协议见 [内容设计](02-content-design.md)，视觉与交互见 [UI/UX](docs/design/ui-ux.md)（卡片语言按 [ADR-0002](docs/decisions/0002-rounded-no-shadow-card-language.md) 采用圆角、无阴影），验证结果见 [验收记录](docs/acceptance.md)。

@@ -1,4 +1,4 @@
----
+﻿---
 /**
  * 配色色板：与明暗外观正交的主题色选择，替代系统控件的 radiogroup 实现。
  * 交互由 ui/palette 以事件委托处理；站点内多处实例共享同一状态。
@@ -18,9 +18,9 @@ const { name, legend, options, value, class: className = '' } = Astro.props;
         data-value={option.value}
         data-state={option.value === value ? 'on' : 'off'}
         title={option.label}
-        class="flex items-center gap-2 border border-transparent bg-soft py-1.5 pr-3 pl-1.5 text-[11px] text-muted transition-colors duration-200 ease-soft hover:text-ink data-[state=on]:border-line-strong data-[state=on]:bg-surface data-[state=on]:text-ink data-[state=on]:shadow-card"
+        class="flex items-center gap-2 rounded-control border border-transparent bg-soft py-1.5 pr-3 pl-1.5 text-[11px] text-muted transition-colors duration-200 ease-soft hover:text-ink data-[state=on]:border-line-strong data-[state=on]:bg-surface data-[state=on]:text-ink"
       >
-        <span class="grid h-5 w-5 shrink-0 place-items-center bg-surface" aria-hidden="true">
+        <span class="grid h-5 w-5 shrink-0 place-items-center rounded-[4px] bg-surface" aria-hidden="true">
           {/* 色块用配色自己的令牌，组件里不写死色值。 */}
           <span class="h-3.5 w-3.5" style={`background:var(--c-swatch-${option.value})`}></span>
         </span>
