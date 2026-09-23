@@ -15,7 +15,7 @@
 - 组件化重构：全站统一为直角卡片、半透明面板与少量装饰线条，移除了内容流分隔线；新增 `src/components/ui/` 公共组件与 `src/scripts/ui/` 自建交互控制器，替换系统下拉框、`details` 与 `dialog`；设计变量通过 `@theme inline` 暴露为 Tailwind 语义工具类。规则见 [UI/UX 规范](docs/design/ui-ux.md) 与 [UI 组件与交互机制](docs/design/components.md)。
 - 背景重设计：首页背景为错位叠放的矩形面板构图，含 `home` / `page` / `minimal` 三个变体、受限指针视差与入场动效。
 - 视觉结果：已检查桌面、平板、手机、英文、深色首页及学习笔记，截图见 [验收记录](docs/acceptance.md)。本轮背景重设计由几何断言、像素采样和对比度计算完成实现侧检查，另有截图与动效录屏证据；本次会话没有可用的图像输入模型，主观视觉复核仍待用户完成。
-- 外部状态：首版实现已提交并推送到 `origin/main`，GitHub Actions「Blog quality」验收通过；未绑定真实域名、Cloudflare 项目或执行线上发布。站点使用标明的演示文章与通用作者占位信息。
+- 外部状态：首版实现与后续视觉迭代（含卡片语言改为圆角、无阴影的 `79ed874`）已提交并推送到 `origin/main`，GitHub Actions「Blog quality」在每次推送后均验收通过（卡片语言本轮 Run 35868806928）；未绑定真实域名、Cloudflare 项目或执行线上发布。站点使用标明的演示文章与通用作者占位信息。
 
 ## 已确认需求与计划默认值
 
