@@ -15,6 +15,8 @@ for (const file of htmlFiles) {
   const $ = await html(file);
   const relative = '/' + path.relative(root,file).split(path.sep).join('/').replace(/index\.html$/, '');
   const isRedirect = $('meta[http-equiv="refresh"]').length > 0;
+  // 内容卡片不允许恢复旧的顶部装饰线；背景独立短线不受此限制。
+  if ($('.hairline').length) errors.push(`${relative}: 残留内容容器装饰线 .hairline`);
   if (!isRedirect && (!$('html').attr('lang') || !$('title').text() || !$('link[rel="canonical"]').attr('href'))) errors.push(`${relative}: 缺少语言、标题或 canonical`);
   if (!isRedirect && $('h1').length !== 1) errors.push(`${relative}: 必须有且只有一个主标题`);
   const canonical = $('link[rel="canonical"]').attr('href');
@@ -52,5 +54,67 @@ for (const locale of ['zh','en']) {
 }
 if (!files.some(f => path.basename(f) === 'pagefind.js')) errors.push('缺少 Pagefind 搜索产物');
 if (!files.some(f => path.basename(f) === 'sitemap-index.xml')) errors.push('缺少 Sitemap');
+
+// 产品交互检查：不残留系统下拉框、details/summary、dialog 或系统提示框。
+const forbidden: [RegExp, string][] = [
+  [/<select[\s>]/i, 'select 元素'],
+  [/<details[\s>]/i, 'details 元素'],
+  [/<summary[\s>]/i, 'summary 元素'],
+  [/<dialog[\s>]/i, 'dialog 元素'],
+  [/\.showModal\s*\(/, 'showModal 调用'],
+  [/\b(?:window\.)?(?:alert|confirm|prompt)\s*\(/, '系统提示框调用'],
+];
+for (const file of htmlFiles) {
+  const source = await readFile(file, 'utf8');
+  for (const [pattern, label] of forbidden) if (pattern.test(source)) errors.push(`${path.relative(root, file)}: 仍在使用${label}`);
+}
+for (const file of files.filter(f => f.endsWith('.js') && f.includes(`${path.sep}_astro${path.sep}`))) {
+  const source = await readFile(file, 'utf8');
+  for (const [pattern, label] of forbidden.slice(4)) if (pattern.test(source)) errors.push(`${path.relative(root, file)}: 仍在使用${label}`);
+}
+
+// 样式检查：语义工具类必须真的产出，被替代的旧组件样式必须已经删除。
+const css = (await Promise.all(files.filter(f => f.endsWith('.css')).map(f => readFile(f, 'utf8')))).join('\n');
+for (const [pattern, label] of [[/\.bg-surface\b/, '语义颜色工具类 bg-surface'], [/\.page-width\b/, '页面容器工具类 page-width'], [/\.shadow-card\b/, '语义阴影工具类 shadow-card']] as const) {
+  if (!pattern.test(css)) errors.push(`构建产物缺少${label}`);
+}
+for (const legacy of ['entry-card', 'filter-bar', 'tag-menu', 'about-art', 'search-field', 'type-filters', 'primary-link', 'hero-panel', 'hairline']) {
+  if (new RegExp(`\\.${legacy}\\s*[,{]`).test(css)) errors.push(`构建产物仍包含被替代的旧样式 .${legacy}`);
+}
+// 配色轴：四份非默认配色都必须产出浅色与深色两组变量，缺一份就会变成半套颜色。
+// 压缩后的属性选择器可能去掉引号，因此用宽松匹配。
+for (const palette of ['jade', 'violet', 'clay', 'graphite']) {
+  if (!new RegExp(`\\[data-palette=["']?${palette}["']?\\]`).test(css)) errors.push(`构建产物缺少配色 ${palette}`);
+}
+if (!css.includes('--c-on-backdrop')) errors.push('构建产物缺少背景水印文字令牌');
+
+// Tailwind 优先：关键页面的布局必须真的由工具类承担，而不是靠遗留全局样式。
+const utility = /\b(?:flex|grid|gap-\d|w-full|mx-auto|p[trblxy]?-\d|m[trblxy]?-\d|text-\[|bg-(?:surface|soft|glass|canvas|accent)|shadow-(?:card|panel|float)|md:|lg:)/;
+for (const page of ['zh/index.html', 'zh/archive/index.html', 'zh/search/index.html', 'zh/about/index.html']) {
+  const $ = await html(path.join(root, page));
+  const hits = $('[class]').toArray().filter(el => utility.test($(el).attr('class') ?? '')).length;
+  if (hits < 20) errors.push(`${page}: 布局没有实际使用 Tailwind 工具类（命中 ${hits}）`);
+}
+
+// 自建交互：模态层、浮层、分段选择与展开区域必须出现在产物中。
+const home = await html(path.join(root, 'zh/index.html'));
+if (home('[data-modal]').length < 3) errors.push('页面缺少自建模态层');
+if (home('[aria-modal="true"]').length < 1) errors.push('模态层缺少 aria-modal');
+if (home('[data-segmented]').length < 1) errors.push('页头缺少主题分段选择');
+if (home('[data-palette-option]').length < 5) errors.push('页头缺少配色色板选项');
+if (home('[data-backdrop="home"]').length !== 1) errors.push('首页缺少背景层次容器');
+const list = await html(path.join(root, 'zh/index.html'));
+if (list('[data-popover]').length < 1) errors.push('内容流缺少标签浮层');
+
+// 软导航：非 HTML 目标必须让浏览器自己处理，否则会被当作页面交换。
+for (const file of htmlFiles) {
+  const $ = await html(file);
+  const relative = '/' + path.relative(root, file).split(path.sep).join('/');
+  for (const el of $('a[href$=".xml"]').toArray()) {
+    if ($(el).attr('data-astro-reload') === undefined) errors.push(`${relative}: ${$(el).attr('href')} 缺少 data-astro-reload`);
+  }
+}
+if (home('meta[name="astro-view-transitions-enabled"]').length !== 1) errors.push('页面缺少软导航标记');
+
 if (errors.length) { console.error([...new Set(errors)].join('\n')); process.exitCode = 1; }
 else console.log(`产物校验通过：${htmlFiles.length} 个 HTML 页面，内部链接、图片、RSS、Sitemap 与草稿隔离正常。`);

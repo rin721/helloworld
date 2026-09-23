@@ -1,0 +1,26 @@
+---
+/** 搜索输入：图标、清空按钮与提交按钮共用一套状态样式，清空按钮由搜索控制器显示。 */
+import Icon from './Icon.astro';
+import IconButton from './IconButton.astro';
+interface Props { id: string; label: string; placeholder: string; value?: string; clearLabel: string; submitLabel: string }
+const { id, label, placeholder, value = '', clearLabel, submitLabel } = Astro.props;
+---
+<form id="search-form" role="search" class="w-full" data-search-form>
+  <label for={id} class="sr-only">{label}</label>
+  <div class="flex items-center gap-2 border border-transparent bg-surface px-4 shadow-card transition-shadow duration-200 ease-soft focus-within:border-line-strong focus-within:shadow-panel">
+    <Icon name="search" size={18} class="shrink-0 text-faint" />
+    <input
+      id={id}
+      type="search"
+      name="q"
+      value={value}
+      placeholder={placeholder}
+      autocomplete="off"
+      class="w-full min-w-0 appearance-none border-0 bg-transparent py-4 font-serif text-xl text-ink outline-none placeholder:text-faint md:text-2xl"
+    />
+    <button type="button" data-search-clear hidden class="grid h-8 w-8 shrink-0 place-items-center text-faint transition-colors duration-200 ease-soft hover:bg-soft hover:text-ink" aria-label={clearLabel}>
+      <Icon name="close" size={15} />
+    </button>
+    <IconButton label={submitLabel} icon="arrow-right" type="submit" variant="solid" size="sm" class="my-2" />
+  </div>
+</form>

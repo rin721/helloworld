@@ -9,6 +9,8 @@ export default defineConfig({
   site,
   output: 'static',
   trailingSlash: 'always',
+  /* 软导航用 ClientRouter；预取只在悬停时发生，避免一次悬停抓取整页链接。 */
+  prefetch: { prefetchAll: true, defaultStrategy: 'hover' },
   integrations: [contentAssets(), sitemap({ filter: (url) => !url.endsWith('/404/') })],
   vite: { plugins: [tailwind()] },
   markdown: { shikiConfig: { themes: { light: 'github-light', dark: 'github-dark' }, defaultColor: false } },

@@ -1,0 +1,31 @@
+---
+/**
+ * 配色色板：与明暗外观正交的主题色选择，替代系统控件的 radiogroup 实现。
+ * 交互由 ui/palette 以事件委托处理；站点内多处实例共享同一状态。
+ */
+interface Props { name: string; legend: string; options: { value: string; label: string }[]; value: string; class?: string }
+const { name, legend, options, value, class: className = '' } = Astro.props;
+---
+<div class={['js-only flex flex-col gap-2', className].join(' ')} data-palette-group data-name={name}>
+  <span class="eyebrow" id={`${name}-legend`}>{legend}</span>
+  <div role="radiogroup" aria-labelledby={`${name}-legend`} class="flex flex-wrap gap-2">
+    {options.map(option => (
+      <button
+        type="button"
+        role="radio"
+        aria-checked={option.value === value}
+        data-palette-option
+        data-value={option.value}
+        data-state={option.value === value ? 'on' : 'off'}
+        title={option.label}
+        class="flex items-center gap-2 border border-transparent bg-soft py-1.5 pr-3 pl-1.5 text-[11px] text-muted transition-colors duration-200 ease-soft hover:text-ink data-[state=on]:border-line-strong data-[state=on]:bg-surface data-[state=on]:text-ink data-[state=on]:shadow-card"
+      >
+        <span class="grid h-5 w-5 shrink-0 place-items-center bg-surface" aria-hidden="true">
+          {/* 色块用配色自己的令牌，组件里不写死色值。 */}
+          <span class="h-3.5 w-3.5" style={`background:var(--c-swatch-${option.value})`}></span>
+        </span>
+        <span>{option.label}</span>
+      </button>
+    ))}
+  </div>
+</div>

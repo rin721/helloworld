@@ -1,0 +1,45 @@
+---
+/**
+ * 按钮：链接和按钮共用一套外观。
+ * variant 决定表面，size 决定体量，`data-state` 由控制器写入以表达加载或成功等状态。
+ */
+import Icon from './Icon.astro';
+import type { IconName } from './icons';
+type Variant = 'primary' | 'quiet' | 'outline' | 'plain';
+type Size = 'sm' | 'md';
+interface Props {
+  [key: string]: unknown;
+  variant?: Variant;
+  size?: Size;
+  href?: string;
+  type?: 'button' | 'submit' | 'reset';
+  icon?: IconName;
+  iconPosition?: 'start' | 'end';
+  class?: string;
+}
+const { variant = 'primary', size = 'md', href, type = 'button', icon, iconPosition = 'end', class: className = '', ...rest } = Astro.props;
+const Tag = href ? 'a' : 'button';
+const surface: Record<Variant, string> = {
+  primary: 'bg-accent text-on-accent hover:bg-[color-mix(in_srgb,var(--c-accent)_86%,var(--c-ink))]',
+  quiet: 'text-muted hover:bg-soft hover:text-ink',
+  outline: 'border border-line-strong text-ink hover:border-accent hover:bg-soft',
+  plain: 'text-accent hover:text-ink',
+};
+const sizes: Record<Size, string> = {
+  sm: 'min-h-[38px] px-4 py-2 text-[11px]',
+  md: 'min-h-[46px] px-6 py-3 text-[12px]',
+};
+const classes = [
+  'inline-flex items-center justify-center gap-3 tracking-[.12em] uppercase',
+  'transition-[background-color,color,border-color,transform] duration-200 ease-soft',
+  'data-[state=busy]:opacity-60',
+  surface[variant],
+  sizes[size],
+  className,
+].join(' ');
+---
+<Tag class={classes} href={href} type={href ? undefined : type} {...rest}>
+  {icon && iconPosition === 'start' && <Icon name={icon} size={size === 'sm' ? 14 : 16} />}
+  <span><slot /></span>
+  {icon && iconPosition === 'end' && <Icon name={icon} size={size === 'sm' ? 14 : 16} class="shrink-0" />}
+</Tag>

@@ -1,0 +1,19 @@
+---
+/** 图片查看：使用自建模态层，左右切换与键盘操作由 interactions 中的控制器驱动。 */
+import { labels, type Locale } from '../config';
+import Modal from './ui/Modal.astro';
+import IconButton from './ui/IconButton.astro';
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const t = labels[locale];
+---
+<Modal id="lightbox" labelledby="lightbox-heading" closeLabel={t.close} size="wide" variant="bare">
+  <div class="flex items-center gap-3 md:gap-5">
+    <IconButton label={locale === 'zh' ? '上一张图片' : 'Previous image'} icon="arrow-left" variant="outline" class="lightbox-prev" />
+    <figure class="min-w-0 flex-1 text-center">
+      <img id="lightbox-image" src="" alt="" class="mx-auto max-h-[74vh] w-auto max-w-full bg-soft object-contain" />
+      <figcaption id="lightbox-caption" class="mt-4 text-xs text-faint"></figcaption>
+    </figure>
+    <IconButton label={locale === 'zh' ? '下一张图片' : 'Next image'} icon="arrow-right" variant="outline" class="lightbox-next" />
+  </div>
+</Modal>

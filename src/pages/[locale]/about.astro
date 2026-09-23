@@ -1,11 +1,41 @@
 ---
 import { getEntry, render } from 'astro:content';
 import Base from '../../layouts/Base.astro';
+import Panel from '../../components/ui/Panel.astro';
+import { site } from '../../config';
 import { labels, locales } from '../../config';
 export function getStaticPaths() { return locales.map(locale => ({ params: { locale }, props: { locale } })); }
 const { locale } = Astro.props;
+const t = labels[locale];
 const entry = await getEntry('pages', `about-${locale}`);
 if (!entry) throw new Error(`Missing about page: ${locale}`);
 const { Content } = await render(entry);
+const cards = [
+  { title: locale === 'zh' ? '写什么' : 'What I write', body: locale === 'zh' ? '日常、学习与光影里的观察，长短不限，尽量真实。' : 'Everyday notes, things learned, and observations in light and shadow.' },
+  { title: locale === 'zh' ? '怎么读' : 'How to read', body: locale === 'zh' ? '列表先给摘要，进入详情后再读全文；可以按类型或标签筛选。' : 'Lists show a summary first. Open an entry to read it whole, or filter by type and tag.' },
+  { title: locale === 'zh' ? '联系方式' : 'Get in touch', body: locale === 'zh' ? '订阅 RSS 获取更新；更多联系方式将在正式发布前补充。' : 'Subscribe to the RSS feed for updates. More ways to reach me will follow.' },
+];
 ---
-<Base locale={locale} title={labels[locale].about}><section class="standard-page page-width about-page"><p class="eyebrow">BEHIND THE WORDS</p><h1 class="page-title">{entry.data.title}<span>.</span></h1><div class="about-art" aria-hidden="true"><div></div><span>HELLO,<br/>WORLD.</span></div><div class="prose"><Content /></div></section></Base>
+<Base locale={locale} title={t.about}>
+  <section class="standard-page page-width about-page pt-14 pb-24 md:pt-[75px]">
+    <header class="relative mb-12 bg-soft px-7 py-9 md:px-10 md:py-12">
+      <span class="geo-slice" aria-hidden="true"></span>
+      <p class="eyebrow">BEHIND THE WORDS</p>
+      <h1 class="page-title mt-3 font-serif text-[38px] leading-tight font-normal md:text-[54px]">{entry.data.title}<span class="text-accent">.</span></h1>
+      <p class="mt-4 font-serif text-[18px] text-muted">{site.author.bio[locale]}</p>
+    </header>
+    <div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_280px]">
+      <Panel padding="lg" class="min-w-0">
+        <div class="prose"><Content /></div>
+      </Panel>
+      <aside class="flex flex-col gap-5">
+        {cards.map(card => (
+          <Panel padding="md" class="relative overflow-hidden" data-motion-item>
+            <h2 class="panel-title text-[19px]">{card.title}</h2>
+            <p class="body-copy mt-3">{card.body}</p>
+          </Panel>
+        ))}
+      </aside>
+    </div>
+  </section>
+</Base>

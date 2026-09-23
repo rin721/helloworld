@@ -1,0 +1,17 @@
+---
+/** 译文缺失提示：与移动导航、图片查看共用自建模态层。 */
+import { labels, type Locale } from '../config';
+import Modal from './ui/Modal.astro';
+import Button from './ui/Button.astro';
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const t = labels[locale];
+const other = locale === 'zh' ? 'en' : 'zh';
+---
+<Modal id="translation-modal" labelledby="translation-modal-title" closeLabel={t.close} title="A NOTE ON LANGUAGE" size="sm">
+  <p class="font-serif text-lg leading-relaxed text-ink">{t.untranslated}</p>
+  <div class="mt-7 flex flex-wrap items-center gap-4">
+    <Button href={`/${other}/`} icon="arrow-right">{t.otherHome}</Button>
+    <Button variant="quiet" data-modal-close>{t.close}</Button>
+  </div>
+</Modal>

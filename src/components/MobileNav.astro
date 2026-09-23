@@ -1,0 +1,33 @@
+---
+/** 移动导航：使用自建模态层，复用模态控制器的焦点循环与滚动锁定。 */
+import { labels, type Locale } from '../config';
+import Modal from './ui/Modal.astro';
+import Icon from './ui/Icon.astro';
+interface Props { locale: Locale; alternate: string | null }
+const { locale, alternate } = Astro.props;
+const t = labels[locale];
+const links = [
+  { href: `/${locale}/`, label: t.home },
+  { href: `/${locale}/#journal`, label: t.journal },
+  { href: `/${locale}/archive/`, label: t.archive },
+  { href: `/${locale}/tags/`, label: t.tags },
+  { href: `/${locale}/types/`, label: t.types },
+  { href: `/${locale}/about/`, label: t.about },
+  { href: `/${locale}/search/`, label: t.search },
+];
+---
+<Modal id="mobile-nav" labelledby="mobile-nav-title" closeLabel={t.close} title={t.menu} size="sm">
+  <nav class="flex flex-col" aria-label={t.menu}>
+    {links.map(link => (
+      <a class="flex items-center justify-between px-3 py-4 font-serif text-lg text-ink transition-colors duration-200 ease-soft hover:bg-soft" href={link.href}>
+        <span>{link.label}</span>
+        <Icon name="arrow-up-right" size={16} class="text-faint" />
+      </a>
+    ))}
+    <a class="flex items-center justify-between px-3 py-4 font-serif text-lg text-ink transition-colors duration-200 ease-soft hover:bg-soft" href={`/${locale}/rss.xml`} data-astro-reload>
+      <span>{t.rss}</span>
+      <Icon name="rss" size={16} class="text-faint" />
+    </a>
+    {alternate && <a class="mt-2 px-3 py-3 text-[12px] tracking-[.08em] text-accent" href={alternate} lang={locale === 'zh' ? 'en' : 'zh'}>{locale === 'zh' ? 'Read in English' : '阅读中文版'}</a>}
+  </nav>
+</Modal>

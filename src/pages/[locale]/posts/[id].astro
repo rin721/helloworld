@@ -2,6 +2,10 @@
 import { render } from 'astro:content';
 import { Image } from 'astro:assets';
 import Base from '../../../layouts/Base.astro';
+import Panel from '../../../components/ui/Panel.astro';
+import Tag from '../../../components/ui/Tag.astro';
+import Disclosure from '../../../components/ui/Disclosure.astro';
+import Icon from '../../../components/ui/Icon.astro';
 import { allPosts, getTranslation, postCover, type Post } from '../../../lib/posts';
 import { labels, formatDate } from '../../../config';
 export async function getStaticPaths() {
@@ -16,20 +20,167 @@ const { Content, headings } = await render(post);
 const toc = headings.filter(h => h.depth <= 3);
 const cover = await postCover(post);
 const translation = getTranslation(post, posts);
+/* 相邻文章沿用既有变量名 previous / next。 */
 const siblings = posts.filter(p => p.locale === locale);
 const index = siblings.findIndex(p => p.id === post.id);
 const previous = siblings[index - 1];
 const next = siblings[index + 1];
+
+/* 模板差异一律由最外层 article 的 data-layout / data-kind 搭配 group-data 变体表达，
+   不再生成 layout-* / kind-* 这类全局 CSS 类，页面也不需要为每个模板写一套结构。 */
+const isGallery = post.data.layout === 'gallery';
+const coverVisible = Boolean(cover) && !isGallery;   // 图片分享的图已经在正文里按顺序出现，不再重复渲染封面
+const typeLabel = isGallery ? t.gallery : t[post.data.kind];
+const dateText = formatDate(post.data.publishedAt, locale);
+
+/* 页面内文案沿用原有写法与措辞，不新增 labels 词条。 */
+const adjacentLabel = locale === 'zh' ? '相邻文章' : 'Adjacent entries';
+const endingText = locale === 'zh' ? '感谢读到这里。' : 'Thank you for spending a little time here.';
+const demoText = locale === 'zh' ? '用于展示排版与阅读体验' : 'A sample to explore the reading experience';
+const translationText = locale === 'zh' ? 'Read in English' : '阅读中文版';
+
+/* 目录链接外观：桌面与移动共用同一串工具类，移动端不再复制样式。
+   scrollspy 会写入 aria-current="location"，用色面与文字强调当前位置。 */
+const outlineLink = 'relative block break-words px-3 py-1.5 text-[13px] leading-snug text-muted transition-colors duration-200 ease-soft hover:bg-soft hover:text-accent aria-[current=location]:bg-accent-soft aria-[current=location]:text-accent';
+const outlineId = 'article-outline-mobile';
 ---
 <Base locale={locale} title={post.data.title} description={post.excerpt || post.data.title} image={cover?.src} article publishedAt={post.data.publishedAt} translationUrl={translation?.url ?? null} noindex={post.data.draft}>
-  <article class:list={['article-page', `layout-${post.data.layout}`, `kind-${post.data.kind}`]} data-pagefind-body data-pagefind-filter={`type:${post.data.kind}`}>
-    <header class="article-header page-width"><a class="breadcrumb" href={`/${locale}/#journal`} data-pagefind-ignore>← {t.journal}</a><div class="article-meta"><span class="eyebrow">{post.data.layout === 'gallery' ? t.gallery : t[post.data.kind]}</span><time datetime={post.data.publishedAt.toISOString()}>{formatDate(post.data.publishedAt, locale)}</time>{post.data.draft && <span class="draft-badge">{t.draft}</span>}</div><h1 data-pagefind-meta="title">{post.data.title}</h1>{post.excerpt && <p class="article-deck">{post.excerpt}</p>}<div class="article-tags tag-list" data-pagefind-ignore>{post.data.tags.map(tag => <a href={`/${locale}/tags/${encodeURIComponent(tag)}/`}>#{tag}</a>)}{translation && <a class="translation-link" href={translation.url}>{locale === 'zh' ? 'Read in English' : '阅读中文版'} ↗</a>}</div>{post.data.demo && <p class="demo-label" data-pagefind-ignore>{t.demo} · {locale === 'zh' ? '用于展示排版与阅读体验' : 'A sample to explore the reading experience'}</p>}</header>
-    {cover && post.data.layout !== 'gallery' && <figure class="article-cover page-width"><Image src={cover} alt={post.data.coverAlt ?? post.data.title} widths={[640, 1000, 1440]} sizes="(max-width: 1100px) 92vw, 1100px" loading="eager" /></figure>}
-    <div class="article-grid page-width">
-      <div class="prose" id="article-body"><Content /></div>
-      {toc.length > 0 && <aside class="toc" data-pagefind-ignore><details open><summary>{t.contents}</summary><nav>{toc.map(h => <a class:list={{ nested: h.depth === 3 }} href={`#${h.slug}`}>{h.text}</a>)}</nav></details></aside>}
+  {/* 模板差异的载体：data-layout / data-kind 供子元素的 group-data-[...] 变体读取。 */}
+  <article class="group pb-20 md:pb-28" data-layout={post.data.layout} data-kind={post.data.kind} data-pagefind-body data-pagefind-filter={`type:${post.data.kind}`}>
+    <header class="page-width pt-10 md:pt-14">
+      {/* 元信息条：返回入口、类型、日期、草稿与译文入口。整条是导航性信息，不进入搜索索引。 */}
+      <Panel variant="glass" padding="sm" class="relative flex flex-wrap items-center gap-x-4 gap-y-2 overflow-hidden md:gap-x-6" data-pagefind-ignore>
+        <span class="geo-slice w-[34%] md:w-[20%]" aria-hidden="true"></span>
+        <a class="relative inline-flex items-center gap-2 text-[11px] tracking-[.14em] text-muted uppercase transition-colors duration-200 ease-soft hover:text-accent" href={`/${locale}/#journal`}>
+          <Icon name="arrow-left" size={14} />
+          {t.journal}
+        </a>
+        <span class="eyebrow relative">{typeLabel}</span>
+        {/* 日记把日期交给标题区放大呈现（serif、较大），这里不重复出现。 */}
+        <time class="relative text-[11px] tracking-[.08em] text-faint group-data-[kind=diary]:hidden" datetime={post.data.publishedAt.toISOString()}>{dateText}</time>
+        {post.data.draft && <Tag variant="solid" class="relative">{t.draft}</Tag>}
+        {translation && (
+          <a class="relative ml-auto inline-flex items-center gap-2 text-[11px] tracking-[.08em] text-accent transition-colors duration-200 ease-soft hover:text-ink" href={translation.url}>
+            {translationText}
+            <Icon name="arrow-up-right" size={14} />
+          </a>
+        )}
+      </Panel>
+
+      {/* 标题面板：大标题保留 data-pagefind-meta="title"，搜索结果的标题依赖它，
+          因此只有面板内的元信息与标签被标记为忽略，标题本身仍然参与索引。 */}
+      <Panel padding="lg" class="relative mt-4 overflow-hidden md:mt-5">
+        <span class="geo-slice" aria-hidden="true"></span>
+        <p class="relative hidden font-serif text-[22px] leading-none tracking-[.02em] text-accent group-data-[kind=diary]:block md:text-[26px]">{dateText}</p>
+        <h1 class="relative mt-3 max-w-[860px] font-serif text-[32px] leading-[1.2] font-normal md:text-[44px] lg:text-[50px]" data-pagefind-meta="title">{post.data.title}</h1>
+        {post.excerpt && <p class="article-deck relative mt-5 max-w-[700px] font-serif text-[18px] leading-[1.8] text-muted md:text-[20px]">{post.excerpt}</p>}
+        <div class="relative mt-7 flex flex-wrap items-center gap-2" data-pagefind-ignore>
+          {post.data.tags.map(tag => <Tag href={`/${locale}/tags/${encodeURIComponent(tag)}/`} class="bg-soft">#{tag}</Tag>)}
+        </div>
+        {post.data.demo && <p class="relative mt-5 text-[11px] tracking-[.06em] text-faint" data-pagefind-ignore>{t.demo} · {demoText}</p>}
+      </Panel>
+    </header>
+
+    {/* 封面：保留 figure.article-cover，图片查看器依赖它收集 .article-cover img。
+        图文模板把封面作为限高的横幅；文字模板若带封面则按原始比例完整呈现。 */}
+    {coverVisible && cover && (
+      <Panel as="figure" padding="none" class="article-cover page-width mt-6 overflow-hidden md:mt-8">
+        <Image
+          src={cover}
+          alt={post.data.coverAlt ?? post.data.title}
+          widths={[640, 1000, 1440]}
+          sizes="(max-width: 1100px) 92vw, 1100px"
+          loading="eager"
+          class="w-full group-data-[layout=illustrated]:max-h-[68vh] group-data-[layout=illustrated]:object-cover"
+        />
+      </Panel>
+    )}
+
+    {/* 正文与目录：md 以上是正文 + 右侧 sticky 目录两栏，手机是单列，
+        目录折叠块排在正文之前。左侧正文列固定在 804px（内边距后约 740px 行宽）。 */}
+    <div class="article-grid page-width mt-6 grid gap-8 md:mt-10 md:grid-cols-[minmax(0,1fr)_minmax(0,220px)] xl:grid-cols-[minmax(0,804px)_minmax(0,268px)] xl:gap-12">
+      {/* 桌面目录。DOM 顺序放在正文之前，移动端才能让折叠目录出现在正文上方；
+          桌面用显式网格位置把它放到右栏，不依赖 order 改变可访问顺序。 */}
+      {toc.length > 0 && (
+        <aside class="toc hidden md:sticky md:top-24 md:col-start-2 md:row-start-1 md:block md:self-start" data-pagefind-ignore>
+          <Panel variant="glass" padding="md" class="relative overflow-hidden group-data-[kind=note]:bg-surface group-data-[kind=note]:shadow-panel">
+            <span class="geo-slice w-[30%]" aria-hidden="true"></span>
+            <p class="panel-title relative text-[19px] md:text-[21px]">{t.contents}</p>
+            <nav class="relative mt-4 flex flex-col" aria-label={t.contents}>
+              {toc.map(heading => <a class:list={[outlineLink, heading.depth === 3 && 'ml-3 opacity-80']} href={`#${heading.slug}`}>{heading.text}</a>)}
+            </nav>
+          </Panel>
+        </aside>
+      )}
+
+      {/* 移动目录：用 Disclosure 的自定义展开区域替代 details/summary。
+          无脚本时区域保持展开、内容仍然可读；折叠由脚本控制，因此只有 html.js 下的
+          data-state="closed" 才把链接真正隐藏（不脚本时保持可见可读）。 */}
+      {toc.length > 0 && (
+        <Panel variant="glass" padding="md" class="relative overflow-hidden md:hidden group-data-[kind=note]:bg-surface group-data-[kind=note]:shadow-panel" data-pagefind-ignore>
+          <span class="geo-slice w-[38%]" aria-hidden="true"></span>
+          <Disclosure id={outlineId} summary={t.contents} variant="block" class="relative">
+            <nav class="toc flex flex-col" aria-label={t.contents}>
+              {toc.map(heading => <a class:list={[outlineLink, heading.depth === 3 && 'ml-3 opacity-80']} href={`#${heading.slug}`}>{heading.text}</a>)}
+            </nav>
+          </Disclosure>
+        </Panel>
+      )}
+
+      {/* 阅读正文。prose / #article-body 是排版与脚本、端到端测试共用的入口，必须保留。
+          画廊模板让正文满宽并给图片 object-contain + 限高；学习笔记通过表头色面加强层次。 */}
+      <Panel
+        padding="none"
+        class={`min-w-0 max-w-[804px] md:col-start-1 md:row-start-1 ${isGallery ? 'py-6 md:py-8' : 'p-6 md:p-8'}`}
+      >
+        <div
+          class="prose group-data-[layout=gallery]:[&_img]:max-h-[72vh] group-data-[layout=gallery]:[&_img]:object-contain group-data-[kind=note]:[&_th]:bg-accent-soft"
+          id="article-body"
+        >
+          <Content />
+        </div>
+      </Panel>
     </div>
-    <div class="article-ending" data-pagefind-ignore><span>✳</span><p>{locale === 'zh' ? '感谢读到这里。' : 'Thank you for spending a little time here.'}</p><a href={`/${locale}/rss.xml`}>{t.rss} ↗</a></div>
-    <nav class="sibling-nav page-width" aria-label={locale === 'zh' ? '相邻文章' : 'Adjacent entries'} data-pagefind-ignore>{previous ? <a href={previous.url}><span>{t.relatedPrevious} ↖</span><strong>{previous.data.title}</strong></a> : <div></div>}{next ? <a href={next.url}><span>{t.relatedNext} ↗</span><strong>{next.data.title}</strong></a> : <div></div>}</nav>
+
+    {/* 结束语：靠半透明表面与留白收束正文。 */}
+    <footer class="article-ending page-width mt-12 md:mt-16" data-pagefind-ignore>
+      <Panel variant="glass" padding="md" class="relative overflow-hidden md:p-8">
+        <span class="geo-slice w-[26%] md:w-[18%]" aria-hidden="true"></span>
+        <p class="relative flex items-center gap-3 font-serif text-[15px] text-ink">
+          <span class="text-accent" aria-hidden="true">✳</span>
+          {endingText}
+        </p>
+        <a class="relative mt-3 inline-flex items-center gap-2 text-[12px] tracking-[.06em] text-accent transition-colors duration-200 ease-soft hover:text-ink" href={`/${locale}/rss.xml`} data-astro-reload>
+          <Icon name="rss" size={15} />
+          {t.rss}
+        </a>
+      </Panel>
+    </footer>
+
+    {/* 相邻文章：两个 Panel 以表面与阴影分组，不使用描边分隔。 */}
+    <nav class="sibling-nav page-width mt-4 grid gap-4 md:mt-5 md:grid-cols-2 md:gap-5" aria-label={adjacentLabel} data-pagefind-ignore>
+      {previous && (
+        <Panel padding="none" lift class="relative overflow-hidden">
+          <a class="flex h-full flex-col gap-2 p-6" href={previous.url}>
+            <span class="eyebrow flex items-center gap-2">
+              <Icon name="arrow-left" size={13} class="lift-arrow" />
+              {t.relatedPrevious}
+            </span>
+            <strong class="panel-title text-[19px] break-words md:text-[21px]">{previous.data.title}</strong>
+          </a>
+        </Panel>
+      )}
+      {next && (
+        <Panel padding="none" lift class={previous ? 'relative overflow-hidden' : 'relative overflow-hidden md:col-start-2'}>
+          <a class="flex h-full flex-col items-end gap-2 p-6 text-right" href={next.url}>
+            <span class="eyebrow flex items-center gap-2">
+              {t.relatedNext}
+              <Icon name="arrow-right" size={13} class="lift-arrow" />
+            </span>
+            <strong class="panel-title text-[19px] break-words md:text-[21px]">{next.data.title}</strong>
+          </a>
+        </Panel>
+      )}
+    </nav>
   </article>
 </Base>

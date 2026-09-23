@@ -1,4 +1,21 @@
 ---
 import Base from '../layouts/Base.astro';
+import Panel from '../components/ui/Panel.astro';
+import Button from '../components/ui/Button.astro';
 ---
-<Base title="404 · 页面未找到" noindex translationUrl="/en/"><section class="not-found page-width"><p class="eyebrow">A SMALL DETOUR</p><span class="error-number">404</span><h1>这一页，暂时留白。</h1><p>也许故事换了一个地方。回到首页，或者寻找另一篇记录。</p><p lang="en">This page could not be found. There is more to discover.</p><div><a class="primary-link" href="/zh/">返回首页 ⟶</a><a class="text-link" href="/zh/search/">搜索内容 ↗</a></div></section></Base>
+<Base title="404 · 页面未找到" noindex translationUrl="/en/" backdrop="minimal">
+  <section class="standard-page page-width pt-16 pb-24">
+    <Panel padding="lg" class="relative overflow-hidden text-center">
+      <span class="geo-slice" aria-hidden="true"></span>
+      <p class="eyebrow relative">A SMALL DETOUR</p>
+      <span class="error-number relative mt-6 block font-serif text-[110px] leading-none text-accent/30 md:text-[150px]">404</span>
+      <h1 class="relative mt-4 font-serif text-[26px] font-normal md:text-[30px]">这一页，暂时留白。</h1>
+      <p class="relative mt-3 text-muted">也许故事换了一个地方。回到首页，或者寻找另一篇记录。</p>
+      <p class="relative mt-2 text-[13px] text-faint" lang="en">This page could not be found. There is more to discover.</p>
+      <div class="relative mt-9 flex flex-wrap items-center justify-center gap-5">
+        <Button href="/zh/" icon="arrow-right" class="primary-link">返回首页</Button>
+        <Button href="/zh/search/" variant="quiet" icon="search" iconPosition="start">搜索内容</Button>
+      </div>
+    </Panel>
+  </section>
+</Base>

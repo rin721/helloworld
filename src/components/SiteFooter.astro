@@ -1,0 +1,33 @@
+---
+/** 站点页脚：词标、静态链接与版权信息；主题设置已在页头。 */
+import { site, labels, type Locale } from '../config';
+import Icon from './ui/Icon.astro';
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const t = labels[locale];
+const links = [
+  { href: `/${locale}/tags/`, label: t.tags },
+  { href: `/${locale}/types/`, label: t.types },
+  { href: `/${locale}/rss.xml`, label: t.rss, external: true },
+];
+---
+<footer class="page-wide mt-24 pb-10">
+  <div class="flex flex-col gap-8 bg-soft px-7 py-9 md:flex-row md:items-center md:justify-between md:px-10">
+    <div class="flex flex-col gap-3">
+      <a class="font-serif text-[17px] tracking-[.28em]" href={`/${locale}/`}>{site.name.toUpperCase()}<span class="text-accent tracking-normal">.</span></a>
+      <p class="text-[11px] text-muted">{locale === 'zh' ? '认真生活，慢慢记录。' : 'Live attentively. Write slowly.'}</p>
+    </div>
+    <nav class="flex flex-wrap items-center gap-x-7 gap-y-3 text-[12px] text-muted" aria-label={t.menu}>
+      {links.map(link => (
+        <a class="inline-flex items-center gap-2 transition-colors duration-200 ease-soft hover:text-ink" href={link.href} data-astro-reload={link.external ? '' : undefined}>
+          {link.label}
+          {link.external && <Icon name="rss" size={14} />}
+        </a>
+      ))}
+    </nav>
+  </div>
+  <div class="mt-5 flex flex-col gap-2 px-1 text-[10px] text-faint md:flex-row md:items-center md:justify-between">
+    <span>© {new Date().getUTCFullYear()} {site.name} <span class="px-2 text-accent">·</span>{locale === 'zh' ? '文字与光影的留存地' : 'A home for words & light'}</span>
+    <span>{locale === 'zh' ? '内容与图片为演示数据' : 'Content and images are demo data'}</span>
+  </div>
+</footer>

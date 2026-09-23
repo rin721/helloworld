@@ -1,0 +1,24 @@
+---
+/** 图标按钮：只承载一个图标，必须提供 label，用于无障碍名称。 */
+import Icon from './Icon.astro';
+import type { IconName } from './icons';
+interface Props {
+  [key: string]: unknown;
+  label: string;
+  icon: IconName;
+  variant?: 'plain' | 'outline' | 'solid';
+  size?: 'sm' | 'md';
+  type?: 'button' | 'submit';
+  class?: string;
+}
+const { label, icon, variant = 'plain', size = 'md', type = 'button', class: className = '', ...rest } = Astro.props;
+const surface = {
+  plain: 'text-muted hover:bg-soft hover:text-ink',
+  outline: 'border border-line-strong text-muted hover:border-accent hover:text-ink',
+  solid: 'bg-accent text-on-accent hover:bg-[color-mix(in_srgb,var(--c-accent)_86%,var(--c-ink))]',
+}[variant];
+const box = { sm: 'h-8 w-8', md: 'h-9 w-9' }[size];
+---
+<button type={type} class={['grid shrink-0 place-items-center transition-colors duration-200 ease-soft', "data-[state=busy]:opacity-60", surface, box, className].join(' ')} aria-label={label} title={label} {...rest}>
+  <Icon name={icon} size={size === 'sm' ? 15 : 18} />
+</button>

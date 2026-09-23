@@ -1,7 +1,7 @@
 export const locales = ['zh', 'en'] as const;
 export type Locale = (typeof locales)[number];
 export const site = {
-  name: 'Hello World',
+  name: "Rin's Blog",
   pageSize: 10,
   description: {
     zh: '在文字与光影之间，记录生活，整理思考。一个关于日常、学习与慢慢生长的个人博客。',
@@ -20,6 +20,7 @@ export const labels = {
     latest: '最近的记录', featured: '精选文章', read: '开始阅读', more: '阅读全文', previous: '上一页', next: '下一页',
     contents: '文章目录', relatedPrevious: '上一篇', relatedNext: '下一篇', noResults: '没有找到相关内容',
     rss: '订阅 RSS', light: '浅色', dark: '深色', system: '跟随系统', theme: '外观', menu: '菜单', close: '关闭',
+    settings: '外观与配色', palette: '配色',
     copy: '复制代码', copied: '已复制', copyFailed: '复制失败，请手动选择代码', draft: '草稿预览', demo: '演示内容',
     untranslated: '这篇内容暂时没有英文译文。你可以继续阅读原文，或前往英文首页。', otherHome: '前往英文首页',
     searchLabel: '搜索文章、日记与学习笔记', searchPlaceholder: '你想找些什么？', searching: '正在搜索…',
@@ -33,6 +34,7 @@ export const labels = {
     latest: 'Recent entries', featured: 'Featured essay', read: 'Read the latest', more: 'Read the story', previous: 'Previous', next: 'Next',
     contents: 'On this page', relatedPrevious: 'Previous entry', relatedNext: 'Next entry', noResults: 'No matching stories',
     rss: 'Subscribe via RSS', light: 'Light', dark: 'Dark', system: 'System', theme: 'Appearance', menu: 'Menu', close: 'Close',
+    settings: 'Appearance & colour', palette: 'Colour theme',
     copy: 'Copy code', copied: 'Copied', copyFailed: 'Could not copy. Please select the code.', draft: 'Draft preview', demo: 'Demo content',
     untranslated: 'This entry has no Chinese translation yet. Keep reading the original, or visit the Chinese homepage.', otherHome: 'Visit Chinese homepage',
     searchLabel: 'Search essays, diaries and study notes', searchPlaceholder: 'What are you looking for?', searching: 'Searching…',
