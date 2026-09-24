@@ -1,0 +1,121 @@
+[
+  {
+    "file": "docs/evidence/dark/home-zh.png",
+    "width": 1440,
+    "height": 3073,
+    "luminance": 41.3,
+    "spread": 52.2
+  },
+  {
+    "file": "docs/evidence/dark/post-zh.png",
+    "width": 1440,
+    "height": 2433,
+    "luminance": 64.7,
+    "spread": 73.1
+  },
+  {
+    "file": "docs/evidence/desktop/about-zh.png",
+    "width": 1440,
+    "height": 900,
+    "luminance": 241.1,
+    "spread": 30.2
+  },
+  {
+    "file": "docs/evidence/desktop/archive-zh.png",
+    "width": 1440,
+    "height": 902,
+    "luminance": 242.2,
+    "spread": 28.2
+  },
+  {
+    "file": "docs/evidence/desktop/home-en.png",
+    "width": 1440,
+    "height": 1777,
+    "luminance": 239.6,
+    "spread": 29.8
+  },
+  {
+    "file": "docs/evidence/desktop/home-zh.png",
+    "width": 1440,
+    "height": 3073,
+    "luminance": 238.9,
+    "spread": 30.6
+  },
+  {
+    "file": "docs/evidence/desktop/post-zh.png",
+    "width": 1440,
+    "height": 2575,
+    "luminance": 234.4,
+    "spread": 30
+  },
+  {
+    "file": "docs/evidence/desktop/search-en.png",
+    "width": 1440,
+    "height": 900,
+    "luminance": 238.7,
+    "spread": 34.9
+  },
+  {
+    "file": "docs/evidence/mobile/archive-zh.png",
+    "width": 390,
+    "height": 1371,
+    "luminance": 243.4,
+    "spread": 32.8
+  },
+  {
+    "file": "docs/evidence/mobile/home-en.png",
+    "width": 390,
+    "height": 2761,
+    "luminance": 237.3,
+    "spread": 37.1
+  },
+  {
+    "file": "docs/evidence/mobile/home-zh.png",
+    "width": 390,
+    "height": 4475,
+    "luminance": 235.8,
+    "spread": 42.6
+  },
+  {
+    "file": "docs/evidence/mobile/nav-menu.png",
+    "width": 390,
+    "height": 844,
+    "luminance": 232.5,
+    "spread": 41.8
+  },
+  {
+    "file": "docs/evidence/mobile/post-zh.png",
+    "width": 390,
+    "height": 2608,
+    "luminance": 237.5,
+    "spread": 35.1
+  },
+  {
+    "file": "docs/evidence/tablet/archive-zh.png",
+    "width": 768,
+    "height": 1527,
+    "luminance": 246.1,
+    "spread": 26.7
+  },
+  {
+    "file": "docs/evidence/tablet/home-en.png",
+    "width": 768,
+    "height": 2459,
+    "luminance": 243.5,
+    "spread": 30.2
+  },
+  {
+    "file": "docs/evidence/tablet/home-zh.png",
+    "width": 768,
+    "height": 3947,
+    "luminance": 240.1,
+    "spread": 36.9
+  },
+  {
+    "file": "docs/evidence/tablet/post-zh.png",
+    "width": 768,
+    "height": 3119,
+    "luminance": 236.4,
+    "spread": 32.9
+  }
+]

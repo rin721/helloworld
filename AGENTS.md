@@ -1,56 +1,57 @@
-﻿# 项目协作与实现规范
+# 项目协作与实现规范
 
 ## 产品与技术基线
 
-这是完整的内容驱动博客。能提前完成的内容计算放到构建阶段，浏览器只承担用户操作所需的交互。
+这是一个完整的内容驱动博客：站点界面、组件与功能以 [fuwari](https://github.com/saicaca/fuwari)（`temp/fuwari`，MIT）为源码基线，内容层保留本项目自己的双语模型。
 
-- 原架构文档中的定稿技术栈已经获得用户确认：Astro 7.3.3、TypeScript Strict、Markdown / Content Collections、Tailwind CSS v4、Astro Components、原生 TypeScript、Astro 图片处理、Shiki、Pagefind、RSS / Sitemap、Vitest / Playwright、pnpm、GitHub Actions / Cloudflare Pages。
-- 继续完善该基线，不自行替换框架、引入 React / Vue、通用 UI 组件库、MDX、CMS、数据库或服务端运行时。
-- 用户已经明确授权首版完整实施；历史分析阶段的确认节点不应被重复解释为本次实施的阻碍。新的产品范围或技术基线变更需先说明影响。
-- 当前范围是内容发布与阅读；评论、点赞计数、留言和账号不在首版范围内。
+- 技术栈：Astro 7（`output: 'static'`）+ Svelte 5（`@astrojs/svelte`）+ Tailwind CSS v4（`@tailwindcss/vite`）+ swup（`@swup/astro` 软导航）+ Stylus（设计变量与 Markdown 扩展样式）+ Pagefind（搜索）+ astro-expressive-code / katex / photoswipe / astro-icon。
+- 依赖取本环境可用的最新版本；TypeScript 固定在 6.x，因为 `@astrojs/check` 与 `@astrojs/svelte` 的 peer 范围不包含 7.x。
+- 代码写法跟随 fuwari（Tab 缩进、双引号、英文注释、Biome 格式化）。项目文档与面向作者的说明保持中文。
+- 不引入 React / Vue、通用 UI 组件库、CMS、数据库或服务端运行时；评论、点赞、账号不在范围内。
 
 ## 目录与职责
 
-- `content/posts/<id>/<zh|en>.md`：文章内容；同目录的语言文件属于同一内容，图片与文章共同维护。
-- `content/pages/`：关于等固定页面的 Markdown。
-- `src/config.ts`：品牌、介绍、作者、界面词典和公共显示设置。
-- `src/content.config.ts`：内容集合 schema；`src/lib/`：共享构建规则与查询。
-- `src/components/` 与 `src/layouts/`：Astro 组件；`src/components/ui/`：按钮、图标按钮、面板、标签、分段选择、搜索输入、展开区域、浮层与模态层等公共组件；`src/pages/`：静态路由与 RSS。
-- `src/scripts/`：浏览器交互；`src/scripts/ui/`：主题、模态、浮层、展开区域、分段选择与页头滚动状态控制器；`src/styles/`：设计变量、基础样式、Markdown 排版与几何绘制。
-- `scripts/`：内容与产物验证；`tests/`：单元与真实浏览器验收。
-- `docs/`：设计、开发、内容、部署和决策记录。先读 `docs/README.md` 找到权威来源。
+- `content/posts/<id>/<zh|en>.md`：文章内容；同一目录的语言文件属于同一内容，图片与文章共同维护。
+- `content/pages/about-*.md`：关于页 Markdown。
+- `src/content.config.ts`：内容集合 schema；`src/lib/rules.ts`：共享构建规则；`src/lib/posts.ts`：把内容集合适配成界面消费的形状。
+- `src/config.ts`：品牌、站点文案（`siteText`）、分类名（`kindLabels`）、导航、作者与许可协议。
+- `src/components/`、`src/layouts/`：fuwari 的界面组件；`src/pages/`：路由（中文在根路径，英文在 `en/`）。
+- `src/utils/`：locale、url、日期、设置与内容查询工具；`src/i18n/`：界面词典（本站只启用 `zh_CN` 与 `en`）。
+- `src/styles/`：`main.css` 聚合入口、`theme.css`（Tailwind 入口与语义工具类）、其余样式文件各自用 `@reference` 声明依赖。
+- `scripts/`：内容与产物校验、新建内容；`tests/`：单元测试与真实浏览器验收；`docs/`：内容、部署、决策与验收证据。
 
-## 内容与 UI 不变量
+## 语言与内容不变量
 
-- 全部内容有标题；手写摘要优先，否则正文提取最多 160 字符；纯图片无文字时没有摘要。
-- 指定封面优先，否则正文首图；无图采用文字卡片。日期、类型和标签展示在卡片中。
-- 内容流为单列宽卡片，最新优先并支持置顶，每页 10 条，分页和筛选使用实际静态链接。
-- 中文、英文分别展示已有内容；译文可选。不存在译文时保留原文并提示，不伪造翻译页面。
-- 草稿只在本地开发预览中可见，不能进入部署 HTML、搜索、RSS、Sitemap 或公开资产。
-- `ui.png` 是视觉参考，不是可直接替代首页的背景截图。使用真实内容组件和 CSS / SVG 构图。
-- 几何背景面板与独立装饰线仅用于首页首屏；其他页面（含搜索、404）只保留主题底色，不添加边缘矩形、投影或竖线。归档时间轴和内容卡片不属于背景装饰。
-- 卡片语言为圆角、无阴影（见 [ADR-0002](docs/decisions/0002-rounded-no-shadow-card-language.md)）：卡片与面板 16px、按钮与输入 8px、小芯片 6px；全站不使用 `box-shadow`，层次只靠卡片与页面底色的明度阶梯、边界与间距表达；浮层与模态用 1px `--c-line` 边界保持可辨。
-- 内容容器禁止添加顶部短线、标题下划线等 `.hairline` 装饰及等价伪元素；产物检查禁止恢复旧样式。背景独立短线、控件焦点与边界、浮层与模态的 1px 边界、表格和引用的语义线条不属于此类残留。
-- 卡片根不得设置 `overflow: hidden`：它会把 `focus-visible` 轮廓裁掉；圆角裁切下沉到封面容器或装饰内层元素，并有专项断言守护。
-- 归档页按用户要求使用纵向虚线时间轴、分组空心圆与文章节点，表达时间顺序；这是明确允许的语义线条，不恢复卡片顶部装饰线或归档行横向分隔线。
-- 布局、间距、排版、响应式和颜色优先使用 Tailwind 工具类，颜色与圆角取自 `@theme inline` 暴露的语义变量。`src/styles/global.css` 只保留主题、基础样式、Markdown 排版、几何绘制与必要关键帧；被替代的旧规则在同一变更中删除，不允许两套样式并行。
-- 公共交互复用 `src/components/ui/` 的组件与 `src/scripts/ui/` 的控制器；不使用系统下拉框、`details`/`summary`、`dialog` 或浏览器提示框承担产品交互。`scripts/check-output.ts` 与单元测试会检查源码与产物中不残留这些元素。
-- 配色（主题色）与明暗是两根正交的轴：配色只能经 `data-palette` 与语义变量实现，颜色值只允许出现在 `src/styles/global.css` 的令牌块中，组件与页面不得写死色值；新增配色必须补齐浅色与深色两组变量并通过对比度断言。
-- 全站使用 `<ClientRouter />` 软导航：站内 HTML 链接不整页刷新。新增脚本必须遵守生命周期契约——文档级监听只注册一次并使用事件委托，页面级初始化放在 `astro:page-load`，退出状态在 `astro:before-swap` 复位，根元素属性在 `astro:after-swap` 写回。非 HTML 目标（如 RSS）必须带 `data-astro-reload`。
-- 页头不常驻固定顶部：向下阅读时隐藏、向上滚动或键盘聚焦时滑出；隐藏状态不得让导航对键盘与读屏不可达（不使用 `inert` 或 `visibility: hidden`）。锚点补偿跟随实测页头高度。状态切换使用非对称缓动（出快进慢、贴顶轻微回弹）与分层淡入的表面，不用瞬间跳变。
-- 新交互必须考虑键盘、焦点、移动端、错误状态及减少动效。模态层需要焦点循环、背景 inert、滚动锁定与焦点恢复。禁用 JavaScript 时仍能浏览和阅读，脚本专属控件不显示为不可操作按钮。
-- 评论和文档以中文解释意图与约束，技术标识保留英文。
+- 中文是默认语言，直接占用根路径（`/`、`/posts/<id>/`）；英文统一在 `/en/` 下（`/en/`、`/en/posts/<id>/`）。不生成 `/zh/` 页面，旧链接由 `public/_redirects` 301 到根路径。
+- 语言由路由决定，界面文案必须显式传入 `locale`：`i18n(key, locale)`、`getPostUrl(locale, slug)`。禁止用模块级可变状态或 `siteConfig.lang` 推断当前语言，否则中英页面会互相污染。
+- 每篇内容有标题、发布日期、类型、展示形式和至少一个标签；日期使用 UTC 日历日期。
+- 手写摘要优先，否则从正文提取最多 160 字符；封面优先使用 `cover`，否则取正文首图，都没有时使用无图卡片。
+- 草稿只在 `pnpm dev` 可见：生产构建在内容 loader 层排除草稿，草稿与草稿私有图片不得进入 `dist`、Pagefind 索引、RSS 或 Sitemap。
+- 译文可选；文章页在有译文时给出译文链接，没有译文时不伪造译文页。
+- 一页 10 条，分页使用真实静态链接（`/2/`、`/en/2/`）；置顶（`pinnedOrder`）优先于日期倒序。
+- 分类由 `kind` 映射（文章／日记／学习笔记），桌面侧栏与归档筛选复用 fuwari 的 `Categories` / `Tags` / `ArchivePanel`。
+
+## 界面与工程约束
+
+- 界面行为以 fuwari 为准：侧栏 Profile／Categories／Tags、导航栏搜索与主题设置、文章目录、代码块、图片灯箱、归档面板、返回顶部。
+- 站内导航由 swup 接管（`Layout.astro` 中的 swup hooks）。新增浏览器脚本必须考虑软导航：在 swup 的 `page:view` / `content:replace` 钩子里重新初始化，不能只依赖首次加载。
+- `client:only="svelte"` 组件在挂载前不可交互；涉及它们的交互与测试都要先等待元素出现再操作。
+- **岛屿组件的 props 必须是最小可序列化纯数据**（字符串、数字、字符串数组）。不要直接传内容集合条目：`Date`、图片元数据、`undefined` 都会让 `client:only` 的 props 反序列化失败，界面在开发环境直接空白。归档面板就是通过 `ArchiveView.astro` 里的映射规避这个问题的。
+- 封面字段统一走 `src/lib/rules.ts` 的 `normalizeCover`：位图是 Astro 的 `ImageMetadata`，**SVG 是可渲染的组件工厂**（工厂上挂 `src`），开发环境下虚拟模块还可能返回相对 URL。任何绕过它的封面读取都会在某个环境下静默丢失封面。
+- Tailwind v4 的 `@apply` 不接受 important 修饰符，需要覆盖时写原生 CSS。每个被 `@import` 的样式文件都要用 `@reference` 声明依赖（Vite 会把它当作独立编译单元）。
+- 颜色与暗色模式走语义变量：`theme.css` 的 `@theme` / `@utility` 与 `variables.styl` 的 `--*` 令牌，暗色依赖 `html.dark` 与 `@custom-variant dark`。
+- 内容协议变化时同步 schema、`scripts/check-content.ts`、`docs/content/authoring.md` 与边界测试。
 
 ## 变更与验证
 
-1. 修改前检查工作区，保留用户文件及未提交更改。
-2. 内容协议变化同步内容维护文档、schema 和有意义的边界测试。
-3. UI 变化检查桌面、平板、手机和深色主题；保存真实截图与必要的交互录像，不用单纯编译成功替代视觉验收。
-4. 运行 `pnpm check`、`pnpm test`、`pnpm build` 和 `pnpm test:e2e`；一键入口为 `pnpm verify`。构建会额外检查产物中不残留系统控件与旧组件样式，并确认页面布局实际使用 Tailwind 工具类。
-5. E2E 使用 4329 独立端口和构建产物，不能复用开发服务。Astro 7 在代理环境可能自动转入后台，测试使用 `--ignore-lock` 保持前台进程。
-6. 交付时区分本地实现、验证结果、外部部署状态；未获当前授权不自行提交、推送或部署。
-7. 更新任务清单中的实施进度和验收证据。产品或架构的重要决策使用 ADR，不把试验过程写成最终规则。
+1. 修改前检查工作区，保留用户文件与未提交更改。
+2. 本机 `pnpm` 若因 `packageManager` 固定版本报错，使用 `npx --yes pnpm@10.22.0 <命令>` 执行同样的脚本。
+3. 运行 `pnpm check`（astro check）、`pnpm test`（Vitest）、`pnpm build`（内容校验 + 构建 + Pagefind + 产物检查）、`pnpm test:e2e`（Playwright，4329 端口与构建产物）；一键入口为 `pnpm verify`。
+4. E2E 使用构建产物，不复用开发服务器；开发服务器包含草稿，不能作为发布验收依据。
+5. UI 变化检查桌面、平板、手机与深色主题，并把截图保存到 `docs/evidence/`，不用编译成功代替视觉验收。
+6. 交付时区分本地实现、验证结果与外部部署状态；未获当前授权不自行提交、推送或部署。
+7. 重要决策写入 `docs/decisions/`，实现变化时同步相关文档，避免同一规则分散在多处。
 
 ## 文档维护
 
-产品行为以产品文档为准；内容格式以内容协议和 schema 为准；技术基线以架构文档为准；协作行为以本文件为准。避免复制同一规则到多份文档，优先添加链接。实现变化时在同一变更中更新相关文档。
+先读 `docs/README.md` 找到权威来源：内容格式以 `docs/content/authoring.md` 与 `src/content.config.ts` 为准，界面基线来自 fuwari，部署以 `docs/deployment.md` 为准，协作行为以本文件为准。

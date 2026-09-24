@@ -8,7 +8,7 @@ permissions:
 jobs:
   verify:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -20,7 +20,10 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm verify
+      - name: Biome 检查
+        run: pnpm exec biome ci ./src
+      - name: 类型、单元、构建与浏览器验收
+        run: pnpm verify
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -28,6 +31,7 @@ jobs:
           path: |
             playwright-report/
             test-results/
+            docs/evidence/
           retention-days: 14
       - uses: actions/upload-artifact@v4
         with:

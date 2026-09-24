@@ -4,21 +4,15 @@
 
 | 文档 | 负责的问题 |
 | --- | --- |
-| [产品设计](../01-product-design.md) | 产品目标、首期范围、页面与阅读路径 |
-| [内容设计](../02-content-design.md) | 内容协议、显示规则与语言关系 |
-| [架构设计](../03-architecture-design.md) | 已定稿技术基线与当前实现分层 |
-| [UI/UX](design/ui-ux.md) | 视觉、卡片语言、模板、响应式、动效和交互约定 |
-| [UI 组件与交互机制](design/components.md) | 公共组件接口、自建交互控制器、状态与动效参数 |
 | [内容维护](content/authoring.md) | 作者如何写作、组织图片、发布及翻译 |
-| [开发规范](development.md) | 工程目录、检查命令和改动流程 |
-| [部署验收](deployment.md) | 构建产物、部署配置和验证边界 |
-| [本地验收记录](acceptance.md) | 实际测试结果、截图与尚未完成的外部部署 |
-| [决策记录](decisions/README.md) | 重要决策的背景、结果及后果 |
-| [AGENTS.md](../AGENTS.md) | 代理的长期协作约束 |
-| [任务记录](../TASKS.md) | 历史沟通、实施进度和验收证据 |
+| [部署与验收](deployment.md) | Cloudflare Pages 配置、构建边界和上线检查 |
+| [决策记录](decisions/0004-fuwari-based-rebuild.md) | 为什么以 fuwari 为源码基线，以及由此产生的后果 |
+| [视觉证据](evidence/README.md) | 桌面、平板、手机与深色主题截图及像素统计 |
+| [AGENTS.md](../AGENTS.md) | 代理与协作者的长期约束 |
+| [README](../README.md) | 快速开始、命令表与文档索引 |
 
 ## 更新方式
 
-产品行为变化时更新产品设计；frontmatter 和查询规则变化时更新内容设计、维护指南和测试；视觉变化时更新设计规范及截图证据；组件接口或交互机制变化时更新组件文档；分层或技术边界变化时新增 ADR 并更新架构补充章节。技术栈已经确定，不以整理文档为由重新选型。
+内容协议变化时更新 `docs/content/authoring.md` 与 `src/content.config.ts`；部署或构建流程变化时更新 `docs/deployment.md`；界面变化时重跑 `pnpm test:e2e` 并刷新 `docs/evidence/` 截图；分层或技术基线变化时新增 ADR，而不是改写历史决策。协作行为只在 `AGENTS.md` 中定义，避免同一规则分散多份文档。
 
-历史沟通的未定项由用户确认的实施计划及明确标注的首版默认值收敛。保留历史记录，不将历史问题误认为当前阻塞。
+历史方向的说明（旧的几何光影视觉、五套配色、`/[locale]/[taxonomy]/` 标签路由等）已随基座替换删除，不再作为当前实现的依据。

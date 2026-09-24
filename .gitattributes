@@ -1,0 +1,10 @@
+# 统一使用 LF：仓库在 Windows 上检出时也不引入 CRLF，
+# 这样 Biome（默认 LF）与上游 fuwari 的格式保持一致。
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
+*.woff binary
+*.woff2 binary

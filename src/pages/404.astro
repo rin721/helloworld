@@ -1,21 +1,21 @@
-﻿---
-import Base from '../layouts/Base.astro';
-import Panel from '../components/ui/Panel.astro';
-import Button from '../components/ui/Button.astro';
 ---
-<Base title="404 · 页面未找到" noindex translationUrl="/en/" backdrop="minimal">
-  <section class="standard-page page-width pt-16 pb-24">
-    <Panel padding="lg" class="relative text-center">
-      <span class="pointer-events-none absolute inset-0 overflow-hidden rounded-card" aria-hidden="true"><span class="geo-slice"></span></span>
-      <p class="eyebrow relative">A SMALL DETOUR</p>
-      <span class="error-number relative mt-6 block font-serif text-[110px] leading-none text-accent/30 md:text-[150px]">404</span>
-      <h1 class="relative mt-4 font-serif text-[26px] font-normal md:text-[30px]">这一页，暂时留白。</h1>
-      <p class="relative mt-3 text-muted">也许故事换了一个地方。回到首页，或者寻找另一篇记录。</p>
-      <p class="relative mt-2 text-[13px] text-faint" lang="en">This page could not be found. There is more to discover.</p>
-      <div class="relative mt-9 flex flex-wrap items-center justify-center gap-5">
-        <Button href="/zh/" icon="arrow-right" class="primary-link">返回首页</Button>
-        <Button href="/zh/search/" variant="quiet" icon="search" iconPosition="start">搜索内容</Button>
-      </div>
-    </Panel>
-  </section>
-</Base>
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+import { defaultLocale } from "@utils/locale";
+import { getArchiveUrl, getHomeUrl } from "@utils/url-utils";
+
+const locale = defaultLocale;
+---
+
+<MainGridLayout title="404" locale={locale}>
+    <div class="card-base px-8 py-10 text-center">
+        <div class="text-3xl font-bold mb-3 text-90">404</div>
+        <p class="text-50 mb-6 transition">
+            这个页面不存在，或已经被移动到别处。<br/>
+            This page does not exist or has moved.
+        </p>
+        <div class="flex flex-wrap gap-3 justify-center">
+            <a class="btn-regular rounded-lg h-10 px-4 font-bold active:scale-95 inline-flex" href={getHomeUrl(locale)}>返回首页 · Back home</a>
+            <a class="btn-regular rounded-lg h-10 px-4 font-bold active:scale-95 inline-flex" href={getArchiveUrl(locale)}>归档 · Archive</a>
+        </div>
+    </div>
+</MainGridLayout>

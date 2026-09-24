@@ -1,18 +1,192 @@
-import { defineConfig } from 'astro/config';
-import sitemap from '@astrojs/sitemap';
-import tailwind from '@tailwindcss/vite';
-import contentAssets from './scripts/content-assets.ts';
+import sitemap from "@astrojs/sitemap";
+import svelte from "@astrojs/svelte";
+import { pluginCollapsibleSections } from "@expressive-code/plugin-collapsible-sections";
+import { pluginLineNumbers } from "@expressive-code/plugin-line-numbers";
+import swup from "@swup/astro";
+import tailwindcss from "@tailwindcss/vite";
+import { unified } from "@astrojs/markdown-remark";
+import { defineConfig } from "astro/config";
+import expressiveCode from "astro-expressive-code";
+import icon from "astro-icon";
+import rehypeAutolinkHeadings from "rehype-autolink-headings";
+import rehypeComponents from "rehype-components"; /* Render the custom directive content */
+import rehypeKatex from "rehype-katex";
+import rehypeSlug from "rehype-slug";
+import remarkDirective from "remark-directive"; /* Handle directives */
+import remarkGithubAdmonitionsToDirectives from "remark-github-admonitions-to-directives";
+import remarkMath from "remark-math";
+import remarkSectionize from "remark-sectionize";
+import contentAssets from "./scripts/content-assets.ts";
+import { expressiveCodeConfig } from "./src/config.ts";
+import { pluginCustomCopyButton } from "./src/plugins/expressive-code/custom-copy-button.js";
+import { pluginLanguageBadge } from "./src/plugins/expressive-code/language-badge.ts";
+import { AdmonitionComponent } from "./src/plugins/rehype-component-admonition.mjs";
+import { GithubCardComponent } from "./src/plugins/rehype-component-github-card.mjs";
+import { parseDirectiveNode } from "./src/plugins/remark-directive-rehype.js";
+import { remarkExcerpt } from "./src/plugins/remark-excerpt.js";
+import { remarkReadingTime } from "./src/plugins/remark-reading-time.mjs";
 
-try { process.loadEnvFile(); } catch (error) { if (error.code !== 'ENOENT') throw error; }
-const site = process.env.SITE_URL || process.env.CF_PAGES_URL || 'http://localhost:4321';
+try {
+	process.loadEnvFile();
+} catch (error) {
+	if (error.code !== "ENOENT") throw error;
+}
+const site =
+	process.env.SITE_URL || process.env.CF_PAGES_URL || "http://localhost:4321";
+
+// https://astro.build/config
 export default defineConfig({
-  site,
-  output: 'static',
-  trailingSlash: 'always',
-  /* 软导航用 ClientRouter；预取只在悬停时发生，避免一次悬停抓取整页链接。 */
-  prefetch: { prefetchAll: true, defaultStrategy: 'hover' },
-  integrations: [contentAssets(), sitemap({ filter: (url) => !url.endsWith('/404/') })],
-  vite: { plugins: [tailwind()] },
-  markdown: { shikiConfig: { themes: { light: 'github-light', dark: 'github-dark' }, defaultColor: false } },
-  i18n: { defaultLocale: 'zh', locales: ['zh', 'en'], routing: { prefixDefaultLocale: true } },
+	site,
+	output: "static",
+	trailingSlash: "always",
+	// 中文为默认语言并直接占用根路径，英文内容统一在 /en/ 下，不再生成 /zh/ 前缀页面。
+	i18n: {
+		defaultLocale: "zh",
+		locales: ["zh", "en"],
+		routing: { prefixDefaultLocale: false },
+	},
+	integrations: [
+		contentAssets(),
+		swup({
+			theme: false,
+			animationClass: "transition-swup-", // see https://swup.js.org/options/#animationselector
+			containers: ["main", "#toc"],
+			smoothScrolling: true,
+			cache: true,
+			preload: true,
+			accessibility: true,
+			updateHead: true,
+			updateBodyClass: false,
+			globalInstance: true,
+		}),
+		icon({
+			include: {
+				"fa6-brands": ["*"],
+				"fa6-regular": ["*"],
+				"fa6-solid": ["*"],
+				"material-symbols": ["*"],
+			},
+		}),
+		expressiveCode({
+			themes: [expressiveCodeConfig.theme, expressiveCodeConfig.theme],
+			plugins: [
+				pluginCollapsibleSections(),
+				pluginLineNumbers(),
+				pluginLanguageBadge(),
+				pluginCustomCopyButton(),
+			],
+			defaultProps: {
+				wrap: true,
+				overridesByLang: {
+					shellsession: {
+						showLineNumbers: false,
+					},
+				},
+			},
+			styleOverrides: {
+				codeBackground: "var(--codeblock-bg)",
+				borderRadius: "0.75rem",
+				borderColor: "none",
+				codeFontSize: "0.875rem",
+				codeFontFamily:
+					"'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace",
+				codeLineHeight: "1.5rem",
+				frames: {
+					editorBackground: "var(--codeblock-bg)",
+					terminalBackground: "var(--codeblock-bg)",
+					terminalTitlebarBackground: "var(--codeblock-topbar-bg)",
+					editorTabBarBackground: "var(--codeblock-topbar-bg)",
+					editorActiveTabBackground: "none",
+					editorActiveTabIndicatorBottomColor: "var(--primary)",
+					editorActiveTabIndicatorTopColor: "none",
+					editorTabBarBorderBottomColor: "var(--codeblock-topbar-bg)",
+					terminalTitlebarBorderBottomColor: "none",
+				},
+				textMarkers: {
+					delHue: 0,
+					insHue: 180,
+					markHue: 250,
+				},
+			},
+			frames: {
+				showCopyToClipboardButton: false,
+			},
+		}),
+		svelte(),
+		sitemap({
+			i18n: { defaultLocale: "zh", locales: { zh: "zh-CN", en: "en" } },
+			filter: (url) => !url.endsWith("/404/"),
+		}),
+	],
+	vite: {
+		plugins: [tailwindcss()],
+		build: {
+			rollupOptions: {
+				onwarn(warning, warn) {
+					// temporarily suppress this warning
+					if (
+						warning.message.includes("is dynamically imported by") &&
+						warning.message.includes("but also statically imported by")
+					) {
+						return;
+					}
+					warn(warning);
+				},
+			},
+		},
+	},
+	markdown: {
+		// Astro 7 的默认处理器是 Sätteri；这里显式选用 remark/rehype 处理器以保留 fuwari 的插件链。
+		processor: unified({
+			remarkPlugins: [
+				remarkMath,
+				remarkReadingTime,
+				remarkExcerpt,
+				remarkGithubAdmonitionsToDirectives,
+				remarkDirective,
+				remarkSectionize,
+				parseDirectiveNode,
+			],
+			rehypePlugins: [
+				rehypeKatex,
+				rehypeSlug,
+				[
+					rehypeComponents,
+					{
+						components: {
+							github: GithubCardComponent,
+							note: (x, y) => AdmonitionComponent(x, y, "note"),
+							tip: (x, y) => AdmonitionComponent(x, y, "tip"),
+							important: (x, y) => AdmonitionComponent(x, y, "important"),
+							caution: (x, y) => AdmonitionComponent(x, y, "caution"),
+							warning: (x, y) => AdmonitionComponent(x, y, "warning"),
+						},
+					},
+				],
+				[
+					rehypeAutolinkHeadings,
+					{
+						behavior: "append",
+						properties: {
+							className: ["anchor"],
+						},
+						content: {
+							type: "element",
+							tagName: "span",
+							properties: {
+								className: ["anchor-icon"],
+								"data-pagefind-ignore": true,
+							},
+							children: [
+								{
+									type: "text",
+									value: "#",
+								},
+							],
+						},
+					},
+				],
+			],
+		}),
+	},
 });

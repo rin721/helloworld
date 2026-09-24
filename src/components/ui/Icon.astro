@@ -1,7 +1,0 @@
----
-/** 统一图标：全部为 24 网格的直角描边图标，颜色继承 currentColor。 */
-import { iconPaths, type IconName } from './icons';
-interface Props { name: IconName; size?: number; strokeWidth?: number; class?: string }
-const { name, size = 18, strokeWidth = 1.4, class: className = '' } = Astro.props;
----
-<svg class={className} width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width={strokeWidth} stroke-linecap="square" stroke-linejoin="miter" aria-hidden="true" focusable="false" set:html={iconPaths[name]} />

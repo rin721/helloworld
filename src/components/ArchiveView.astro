@@ -1,0 +1,30 @@
+---
+import ArchivePanel from "@components/ArchivePanel.svelte";
+import I18nKey from "@i18n/i18nKey";
+import { i18n } from "@i18n/translation";
+import MainGridLayout from "@layouts/MainGridLayout.astro";
+import { getSortedPostsList } from "@utils/content-utils";
+import type { AppLocale } from "@utils/locale";
+import type { ArchivePost } from "@/types/archive";
+
+interface Props {
+	locale: AppLocale;
+}
+
+const { locale } = Astro.props;
+
+// 只把岛屿组件需要的字段传下去，并且全部转成可序列化的纯数据。
+const sortedPosts: ArchivePost[] = (await getSortedPostsList(locale)).map(
+	(post) => ({
+		slug: post.slug,
+		title: post.data.title,
+		tags: post.data.tags,
+		category: post.data.category ?? "",
+		published: post.data.published.toISOString(),
+	}),
+);
+---
+
+<MainGridLayout title={i18n(I18nKey.archive, locale)} locale={locale}>
+    <ArchivePanel sortedPosts={sortedPosts} locale={locale} client:only="svelte"></ArchivePanel>
+</MainGridLayout>

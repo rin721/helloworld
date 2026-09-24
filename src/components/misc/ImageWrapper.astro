@@ -1,0 +1,65 @@
+---
+import { Image } from "astro:assets";
+import path from "node:path";
+import type { ImageMetadata } from "astro";
+import type { CoverMeta } from "@/lib/rules";
+import { url } from "../../utils/url-utils";
+
+interface Props {
+	id?: string;
+	// 内容集合给出的封面：位图是元数据对象，SVG 与开发环境下的虚拟模块是地址字符串。
+	src: string | CoverMeta;
+	class?: string;
+	alt?: string;
+	position?: string;
+	basePath?: string;
+}
+
+const { id, src, alt, position = "center", basePath = "/" } = Astro.props;
+const className = Astro.props.class;
+
+const given = typeof src === "string" ? src : undefined;
+const isPublic = !!given && given.startsWith("/");
+const isLocal =
+	!given ||
+	!(
+		given.startsWith("/") ||
+		given.startsWith("http") ||
+		given.startsWith("https") ||
+		given.startsWith("data:")
+	);
+
+let img: CoverMeta | undefined =
+	typeof src === "object" && src !== null ? src : undefined;
+
+// TODO temporary workaround for images dynamic import
+// https://github.com/withastro/astro/issues/3373
+// 用于站点自身资源（如 profileConfig.avatar 这类 src/ 下的相对路径）。
+if (given && isLocal) {
+	const files = import.meta.glob<ImageMetadata>("../../**", {
+		import: "default",
+	});
+	const normalizedPath = path
+		.normalize(path.join("../../", basePath, given))
+		.replace(/\\/g, "/");
+	const file = files[normalizedPath];
+	if (!file) {
+		console.error(
+			`\n[ERROR] Image file not found: ${normalizedPath.replace("../../", "src/")}`,
+		);
+	} else {
+		img = await file();
+	}
+}
+
+const imageClass = "w-full h-full object-cover";
+const imageStyle = `object-position: ${position}`;
+---
+<div id={id} class:list={[className, 'overflow-hidden relative']}>
+    <div class="transition absolute inset-0 dark:bg-black/10 bg-opacity-50 pointer-events-none"></div>
+    {img
+        ? <Image src={img as unknown as ImageMetadata} alt={alt || ""} class={imageClass} style={imageStyle}/>
+        : given
+            ? <img src={isPublic ? url(given) : given} alt={alt || ""} class={imageClass} style={imageStyle}/>
+            : null}
+</div>

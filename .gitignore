@@ -4,7 +4,9 @@ dist/
 .env
 .env.*
 !.env.example
-# Playwright 运行产物（含 test-results-inner-background 等 --output 变体）不进版本库。
+# Playwright 运行产物（含 test-results-* 等 --output 变体）不进版本库。
 test-results*/
 playwright-report/
 .cache/
+# 参考主题源码、探针脚本等临时空间。
+temp/
