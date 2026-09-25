@@ -1,6 +1,10 @@
 @reference "./theme.css";
 
 .custom-md {
+    &.about-markdown > section:first-child > :is(h1, h2, h3, h4, h5, h6):first-child {
+        margin-block-start: 0;
+    }
+
     h1 {
         @apply text-3xl;
     }
@@ -127,4 +131,3 @@
     }
     
 }
-

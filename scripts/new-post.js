@@ -7,11 +7,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 function today() {
-	const now = new Date();
-	const year = now.getFullYear();
-	const month = String(now.getMonth() + 1).padStart(2, "0");
-	const day = String(now.getDate()).padStart(2, "0");
-	return `${year}-${month}-${day}T${String(now.getHours()).padStart(2, "0")}:00:00Z`;
+	return `${new Date().toISOString().slice(0, 10)}T08:00:00Z`;
 }
 
 const [id] = process.argv.slice(2);
@@ -32,21 +28,23 @@ if (fs.existsSync(dir)) {
 	process.exit(1);
 }
 
-const frontmatter = (title, lang) => `---
-title: ${title}
+const frontmatter = (lang) => `---
+title: "${lang === "zh" ? "待填写中文标题" : "Fill in the English title"}"
 publishedAt: ${today()}
 kind: article # article | diary | note
 layout: text # text | illustrated | gallery
-tags: []
+tags: [${lang === "zh" ? '"待补充"' : '"TODO"'}]
 draft: true # 草稿只在本地开发预览中可见
-summary: ""
+# 可选封面（先把图片放在本目录，再取消下面两行注释）
+# cover: ./cover.png
+# coverAlt: "图片的替代文字"
 ---
 
 ${lang === "zh" ? "在这里写下正文。" : "Write the story here."}
 `;
 
 fs.mkdirSync(dir, { recursive: true });
-fs.writeFileSync(path.join(dir, "zh.md"), frontmatter(id, "zh"));
-fs.writeFileSync(path.join(dir, "en.md"), frontmatter(id, "en"));
+fs.writeFileSync(path.join(dir, "zh.md"), frontmatter("zh"));
+fs.writeFileSync(path.join(dir, "en.md"), frontmatter("en"));
 
 console.log(`已创建 ${dir}/zh.md 与 ${dir}/en.md（默认草稿，翻译可选，可删除不需要的语言文件）`);

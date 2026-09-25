@@ -1,6 +1,8 @@
 ---
 
 import { profileConfig } from "../config";
+import I18nKey from "../i18n/i18nKey";
+import { i18n } from "../i18n/translation";
 import { type AppLocale, defaultLocale } from "../utils/locale";
 import { getRssUrl, url } from "../utils/url-utils";
 
@@ -13,14 +15,16 @@ const { locale = defaultLocale } = Astro.props;
 const currentYear = new Date().getFullYear();
 ---
 
-<div class="transition border-t border-black/10 dark:border-white/15 my-10 border-dashed mx-32"></div>
-<div class="transition border-dashed border-[oklch(85%_0.01_var(--hue))] dark:border-white/15 rounded-2xl mb-12 flex flex-col items-center justify-center px-6">
-    <div class="transition text-50 text-sm text-center">
-        &copy; <span id="copyright-year">{currentYear}</span> {profileConfig.name}. All Rights Reserved. /
-        <a class="transition link text-[var(--primary)] font-medium" target="_blank" href={getRssUrl(locale)}>RSS</a> /
-        <a class="transition link text-[var(--primary)] font-medium" target="_blank" href={url('sitemap-index.xml')}>Sitemap</a><br>
-        Powered by
-        <a class="transition link text-[var(--primary)] font-medium" target="_blank" href="https://astro.build">Astro</a> &
-        <a class="transition link text-[var(--primary)] font-medium" target="_blank" href="https://github.com/saicaca/fuwari">Fuwari</a>
+<div class="mb-12 rounded-2xl bg-white px-6 py-8">
+    <div class="transition border-t border-black/10 my-2 border-dashed mx-32"></div>
+    <div class="transition rounded-2xl flex flex-col items-center justify-center px-6">
+        <div class="transition text-50 text-sm text-center">
+            &copy; <span id="copyright-year">{currentYear}</span> {profileConfig.name}. {i18n(I18nKey.allRightsReserved, locale)} /
+            <a class="transition link text-[var(--primary)] font-medium" target="_blank" href={getRssUrl(locale)}>RSS</a> /
+            <a class="transition link text-[var(--primary)] font-medium" target="_blank" href={url('sitemap-index.xml')}>Sitemap</a><br>
+            {i18n(I18nKey.poweredBy, locale)}
+            <a class="transition link text-[var(--primary)] font-medium" target="_blank" href="https://astro.build">Astro</a> &
+            <a class="transition link text-[var(--primary)] font-medium" target="_blank" href="https://github.com/saicaca/fuwari">Fuwari</a>
+        </div>
     </div>
 </div>

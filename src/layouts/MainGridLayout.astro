@@ -3,6 +3,8 @@ import BackToTop from "@components/control/BackToTop.astro";
 import Footer from "@components/Footer.astro";
 import Navbar from "@components/Navbar.astro";
 import SideBar from "@components/widget/SideBar.astro";
+import I18nKey from "@i18n/i18nKey";
+import { i18n } from "@i18n/translation";
 import { type AppLocale, defaultLocale } from "@utils/locale";
 import type { MarkdownHeading } from "astro";
 import { Icon } from "astro-icon/components";
@@ -56,7 +58,7 @@ const mainPanelTop = siteConfig.banner.enable
 
 <!-- Banner -->
 {siteConfig.banner.enable && <div id="banner-wrapper" class={`absolute z-10 w-full transition duration-700 overflow-hidden`} style={`top: -${BANNER_HEIGHT_EXTEND}vh`}>
-    <ImageWrapper id="banner" alt="Banner image of the blog" class:list={["object-cover h-full transition duration-700 opacity-0 scale-105"]}
+    <ImageWrapper id="banner" alt={i18n(I18nKey.bannerImage, locale)} class:list={["object-cover h-full transition duration-700 opacity-0 scale-105"]}
                   src={siteConfig.banner.src} position={siteConfig.banner.position}
     >
     </ImageWrapper>
@@ -70,7 +72,7 @@ const mainPanelTop = siteConfig.banner.enable
     mx-auto gap-4 px-0 md:px-4"
         >
             <!-- Banner image credit -->
-            {hasBannerCredit && <a href={siteConfig.banner.credit.url} id="banner-credit" target="_blank" rel="noopener" aria-label="Visit image source"
+{hasBannerCredit && <a href={siteConfig.banner.credit.url} id="banner-credit" target="_blank" rel="noopener" aria-label={i18n(I18nKey.imageSource, locale)}
                                    class:list={["group onload-animation transition-all absolute flex justify-center items-center rounded-full " +
                                    "px-3 right-4 -top-[3.25rem] bg-black/60 hover:bg-black/70 h-9", {"hover:pr-9 active:bg-black/80": hasBannerLink}]}
             >
@@ -90,18 +92,19 @@ const mainPanelTop = siteConfig.banner.enable
                     <!-- the overflow-hidden here prevent long text break the layout-->
                     <!-- make id different from windows.swup global property -->
                     <slot></slot>
-                    <div class="footer col-span-2 onload-animation hidden lg:block">
-                        <Footer locale={locale}></Footer>
-                    </div>
                 </div>
             </main>
+
+            <div class="footer col-span-2 onload-animation hidden lg:block">
+                <Footer locale={locale}></Footer>
+            </div>
 
             <div class="footer col-span-2 onload-animation block lg:hidden">
                 <Footer locale={locale}></Footer>
             </div>
         </div>
 
-        <BackToTop></BackToTop>
+        <BackToTop locale={locale}></BackToTop>
     </div>
 </div>
 
@@ -115,7 +118,7 @@ const mainPanelTop = siteConfig.banner.enable
             <div id="toc-inner-wrapper" class="fixed top-14 w-[var(--toc-width)] h-[calc(100vh_-_20rem)] overflow-y-scroll overflow-x-hidden hide-scrollbar">
                 <div id="toc" class="w-full h-full transition-swup-fade ">
                     <div class="h-8 w-full"></div>
-                    <TOC headings={headings}></TOC>
+                    <TOC headings={headings} locale={locale}></TOC>
                     <div class="h-8 w-full"></div>
                 </div>
             </div>
