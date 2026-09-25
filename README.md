@@ -4,6 +4,8 @@
 
 中文是默认语言并直接使用根路径（`/`），英文在 `/en/` 下；旧的 `/zh/…` 链接由 `public/_redirects` 301 到根路径。
 
+点击语言切换会在浏览器中记住选择。再次打开根首页时会按已保存的英文偏好进入 `/en/`；文章等深链接始终按 URL 展示对应语言。关闭浏览器存储或禁用 JavaScript 时，根首页仍显示中文。界面文案由 `src/i18n/` 的中英文词典统一提供，站点品牌与作者文案由 `src/config.ts` 提供。
+
 当前包含 12 篇中文演示内容、其中 6 篇的英文版本，以及 1 篇仅供本地预览的草稿。演示文章与图片不代表作者的真实经历。
 
 ## 开始使用
@@ -52,7 +54,7 @@ pnpm preview --port 4330
 - [视觉证据](docs/evidence/README.md)：桌面、平板、手机与深色主题截图。
 - [协作规范](AGENTS.md)：长期修改规则。
 
-站点名称、描述和界面文案在 `src/config.ts`；关于页面在 `content/pages/`。通过 `.env` 或环境变量设置 `SITE_URL`，部署时也可以使用 Cloudflare 提供的 `CF_PAGES_URL`。
+站点名称与描述在 `src/config.ts`；关于页面在 `content/pages/`。通过 `.env` 或环境变量设置 `SITE_URL`，部署时也可以使用 Cloudflare 提供的 `CF_PAGES_URL`。
 
 ## 许可与致谢
 

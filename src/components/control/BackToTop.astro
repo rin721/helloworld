@@ -1,11 +1,19 @@
 ---
 import { Icon } from "astro-icon/components";
+import I18nKey from "../../i18n/i18nKey";
+import { i18n } from "../../i18n/translation";
+import { type AppLocale, defaultLocale } from "../../utils/locale";
+
+interface Props {
+	locale?: AppLocale;
+}
+const { locale = defaultLocale } = Astro.props;
 ---
 
 <!-- There can't be a filter on parent element, or it will break `fixed` -->
 <div class="back-to-top-wrapper hidden lg:block">
     <div id="back-to-top-btn" class="back-to-top-btn hide flex items-center rounded-2xl overflow-hidden transition" onclick="backToTop()">
-        <button aria-label="Back to Top" class="btn-card h-[3.75rem] w-[3.75rem]">
+        <button aria-label={i18n(I18nKey.backToTop, locale)} class="btn-card h-[3.75rem] w-[3.75rem]">
             <Icon name="material-symbols:keyboard-arrow-up-rounded" class="mx-auto"></Icon>
         </button>
     </div>

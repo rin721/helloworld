@@ -117,6 +117,20 @@ const bannerOffset =
 
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
+		<!-- Restore the saved language before the home page is painted. Explicit deep links keep their URL language. -->
+		<script is:inline>
+			try {
+				const path = window.location.pathname;
+				const saved = localStorage.getItem("locale");
+				if (path === "/" && saved === "en") {
+					window.location.replace("/en/");
+				} else if (path !== "/") {
+					localStorage.setItem("locale", path === "/en" || path.startsWith("/en/") ? "en" : "zh");
+				}
+			} catch {
+				// Storage may be unavailable; the requested static page remains usable.
+			}
+		</script>
 		{favicons.map(favicon => (
 			<link rel="icon"
 				  href={favicon.src.startsWith('/') ? url(favicon.src) : favicon.src}
@@ -164,7 +178,7 @@ const bannerOffset =
 		<link rel="alternate" type="application/rss+xml" title={siteConfig.title} href={new URL(getRssUrl(locale), Astro.site)}/>
 
 	</head>
-	<body class=" min-h-screen transition " class:list={[{"lg:is-home": isHomePage, "enable-banner": enableBanner}]}
+	<body class=" min-h-screen transition " class:list={[{"is-home": isHomePage, "enable-banner": enableBanner}]}
 		  data-overlayscrollbars-initialize
 	>
 		<ConfigCarrier></ConfigCarrier>
@@ -175,6 +189,48 @@ const bannerOffset =
 	</body>
 </html>
 
+<script>
+// Remember the selected locale before its full page navigation.
+document.addEventListener("click", (event) => {
+	if (!(event.target instanceof Element)) return;
+	const link = event.target.closest<HTMLAnchorElement>("a[data-locale-switch]");
+	const target = link?.dataset.localeSwitch;
+	if (!link || (target !== "zh" && target !== "en")) return;
+	const targetUrl = localizedSwitchUrl(link, target);
+	if (targetUrl) link.href = targetUrl;
+	try {
+		localStorage.setItem("locale", target);
+	} catch {
+		// The link itself still works without storage.
+	}
+}, true);
+
+function localizedSwitchUrl(link: HTMLAnchorElement, target: string): string | undefined {
+	const current = window.location.pathname.replace(/^\/en(?:\/|$)/, "").replace(/^\/+|\/+$/g, "");
+	const isPage = /^\d+$/.test(current);
+	if (current !== "" && current !== "archive" && current !== "about" && !isPage) {
+		return target === "en" ? "/en/" : "/";
+	}
+	const targetPageCount = Number(link.dataset.targetPageCount);
+	const path = isPage && Number(current) > targetPageCount ? "" : current;
+	return `${target === "en" ? "/en" : ""}/${path ? `${path}/` : ""}`;
+}
+
+function syncLocaleSwitcher() {
+	const link = document.querySelector<HTMLAnchorElement>("a[data-locale-switch]");
+	if (!link) return;
+	const target = link.dataset.localeSwitch;
+	const href = target ? localizedSwitchUrl(link, target) : undefined;
+	if (href) link.href = href;
+}
+
+if (window.swup?.hooks) {
+	window.swup.hooks.on("page:view", syncLocaleSwitcher);
+} else {
+	document.addEventListener("swup:enable", () => window.swup.hooks.on("page:view", syncLocaleSwitcher), { once: true });
+}
+</script>
+
 <style is:global define:vars={{
 	bannerOffset,
 	'banner-height-home': `${BANNER_HEIGHT_HOME}vh`,
@@ -182,30 +238,34 @@ const bannerOffset =
 }}>
 @reference "../styles/main.css";
 @layer components {
-	.enable-banner.is-home #banner-wrapper {
-		@apply h-[var(--banner-height-home)] translate-y-[var(--banner-height-extend)]
-	}
 	.enable-banner #banner-wrapper {
 		@apply h-[var(--banner-height-home)]
-	}
-
-	.enable-banner.is-home #banner {
-		@apply h-[var(--banner-height-home)] translate-y-0
 	}
 	.enable-banner #banner {
 		@apply h-[var(--banner-height-home)] translate-y-[var(--bannerOffset)]
 	}
-	.enable-banner.is-home #main-grid {
-		@apply translate-y-[var(--banner-height-extend)];
-	}
 	.enable-banner #top-row {
 		@apply h-[calc(var(--banner-height-home)_-_4.5rem)] transition-all duration-300
 	}
-	.enable-banner.is-home #sidebar-sticky {
-		@apply top-[calc(1rem_-_var(--banner-height-extend))]
+	@media (min-width: 64rem) {
+		.enable-banner.is-home #banner-wrapper {
+			@apply h-[var(--banner-height-home)] translate-y-[var(--banner-height-extend)]
+		}
+		.enable-banner.is-home #banner {
+			@apply h-[var(--banner-height-home)] translate-y-0
+		}
+		.enable-banner.is-home #main-grid {
+			@apply translate-y-[var(--banner-height-extend)];
+		}
 	}
 	.navbar-hidden {
 		@apply opacity-0 -translate-y-16
+	}
+}
+/* Keep the homepage sticky offset above Tailwind v4 utility-layer precedence. */
+@media (min-width: 64rem) {
+	body.enable-banner.is-home #sidebar-sticky {
+		top: calc(1rem - var(--banner-height-extend));
 	}
 }
 </style>
@@ -418,7 +478,7 @@ const setup = () => {
 		}
 		let threshold = window.innerHeight * (BANNER_HEIGHT / 100) - 72 - 16
 		let navbar = document.getElementById('navbar-wrapper')
-		if (!navbar || !document.body.classList.contains('lg:is-home')) {
+		if (!navbar || !document.body.classList.contains('is-home')) {
 			return
 		}
 		if (document.body.scrollTop >= threshold || document.documentElement.scrollTop >= threshold) {
@@ -430,9 +490,9 @@ const setup = () => {
 		// change banner height immediately when a link is clicked
 		const bodyElement = document.querySelector('body')
 		if (isHomePath(new URL(visit.to.url, window.location.origin).pathname)) {
-			bodyElement!.classList.add('lg:is-home');
+			bodyElement!.classList.add('is-home');
 		} else {
-			bodyElement!.classList.remove('lg:is-home');
+			bodyElement!.classList.remove('is-home');
 		}
 
 		// increase the page height during page transition to prevent the scrolling animation from jumping
@@ -503,7 +563,7 @@ function scrollFunction() {
 		const MAIN_PANEL_EXCESS_HEIGHT = MAIN_PANEL_OVERLAPS_BANNER_HEIGHT * 16			// The height the main panel overlaps the banner
 
 		let bannerHeight = BANNER_HEIGHT
-		if (document.body.classList.contains('lg:is-home') && window.innerWidth >= 1024) {
+		if (document.body.classList.contains('is-home') && window.innerWidth >= 1024) {
 			bannerHeight = BANNER_HEIGHT_HOME
 		}
 		let threshold = window.innerHeight * (bannerHeight / 100) - NAVBAR_HEIGHT - MAIN_PANEL_EXCESS_HEIGHT - 16

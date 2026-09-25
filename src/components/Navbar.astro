@@ -1,10 +1,14 @@
 ---
 import { Icon } from "astro-icon/components";
 import { navBarConfig, siteConfig } from "../config";
+import { PAGE_SIZE } from "../constants/constants";
 import { linkPresets } from "../constants/link-presets";
+import I18nKey from "../i18n/i18nKey";
+import { i18n } from "../i18n/translation";
 import { LinkPreset, type NavBarLink } from "../types/config";
+import { getSortedPosts } from "../utils/content-utils";
 import { type AppLocale, defaultLocale } from "../utils/locale";
-import { switchLocaleUrl, url } from "../utils/url-utils";
+import { getHomeUrl, switchLocaleUrl, url } from "../utils/url-utils";
 import LightDarkSwitch from "./LightDarkSwitch.svelte";
 import Search from "./Search.svelte";
 import DisplaySettings from "./widget/DisplaySettings.svelte";
@@ -12,9 +16,16 @@ import NavMenuPanel from "./widget/NavMenuPanel.astro";
 
 const { locale = defaultLocale, class: className } = Astro.props;
 
-// 语言切换只出现在中英两版共有的页面上，文章页的语言入口在正文头部。
+// Shared pages keep their current route; article routes fall back to the target locale home.
 const targetLocale: AppLocale = locale === "zh" ? "en" : "zh";
-const switchHref = switchLocaleUrl(Astro.url.pathname, targetLocale);
+const targetPageCount = Math.ceil(
+	(await getSortedPosts(targetLocale)).length / PAGE_SIZE,
+);
+const switchHref = switchLocaleUrl(
+	Astro.url.pathname,
+	targetLocale,
+	targetPageCount,
+) ?? getHomeUrl(targetLocale);
 const presets = linkPresets(locale);
 
 let links: NavBarLink[] = navBarConfig.links.map(
@@ -31,7 +42,7 @@ let links: NavBarLink[] = navBarConfig.links.map(
     <div class:list={[
         className,
         "card-base !overflow-visible max-w-[var(--page-width)] h-[4.5rem] !rounded-t-none mx-auto flex items-center justify-between px-4"]}>
-        <a href={url('/')} class="btn-plain scale-animation rounded-lg h-[3.25rem] px-5 font-bold active:scale-95">
+        <a href={getHomeUrl(locale)} class="btn-plain scale-animation rounded-lg h-[3.25rem] px-5 font-bold active:scale-95">
             <div class="flex flex-row text-[var(--primary)] items-center text-md">
                 <Icon name="material-symbols:home-outline-rounded" class="text-[1.75rem] mb-1 mr-2" />
                 {siteConfig.title}
@@ -53,19 +64,18 @@ let links: NavBarLink[] = navBarConfig.links.map(
             <!--<SearchPanel client:load>-->
             <Search client:only="svelte" locale={locale}></Search>
             {!siteConfig.themeColor.fixed && (
-                    <button aria-label="Display Settings" class="btn-plain scale-animation rounded-lg h-11 w-11 active:scale-90" id="display-settings-switch">
+                    <button aria-label={i18n(I18nKey.displaySettings, locale)} class="btn-plain scale-animation rounded-lg h-11 w-11 active:scale-90" id="display-settings-switch">
                         <Icon name="material-symbols:palette-outline" class="text-[1.25rem]"></Icon>
                     </button>
             )}
             <LightDarkSwitch client:only="svelte" locale={locale}></LightDarkSwitch>
             {switchHref && (
-                <a href={switchHref} hreflang={targetLocale} aria-label={`Switch language to ${targetLocale}`}
-                   class="btn-plain scale-animation rounded-lg h-11 px-3 gap-1 font-bold active:scale-95">
-                    <Icon name="material-symbols:translate" class="text-[1.25rem]"></Icon>
-                    <span class="hidden sm:inline">{targetLocale === "en" ? "EN" : "中文"}</span>
-                </a>
+                    <a href={switchHref} hreflang={targetLocale} data-locale-switch={targetLocale} data-target-page-count={targetPageCount} data-no-swup aria-label={`${i18n(I18nKey.switchLanguage, locale)} ${targetLocale === "en" ? "English" : "中文"}`}
+                       class="btn-plain scale-animation rounded-lg h-11 w-11 active:scale-90">
+                        <Icon name="material-symbols:translate" class="text-[1.25rem]"></Icon>
+                    </a>
             )}
-            <button aria-label="Menu" name="Nav Menu" class="btn-plain scale-animation rounded-lg w-11 h-11 active:scale-90 md:!hidden" id="nav-menu-switch">
+            <button aria-label={i18n(I18nKey.navigationMenu, locale)} name="Nav Menu" class="btn-plain scale-animation rounded-lg w-11 h-11 active:scale-90 md:!hidden" id="nav-menu-switch">
                 <Icon name="material-symbols:menu-rounded" class="text-[1.25rem]"></Icon>
             </button>
         </div>

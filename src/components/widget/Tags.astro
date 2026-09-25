@@ -21,10 +21,10 @@ const COLLAPSED_HEIGHT = "7.5rem";
 
 const isCollapsed = tags.length >= 20;
 ---
-<WidgetLayout name={i18n(I18nKey.tags, locale)} id="tags" isCollapsed={isCollapsed} collapsedHeight={COLLAPSED_HEIGHT} class={className} style={style}>
+<WidgetLayout name={i18n(I18nKey.tags, locale)} id="tags" isCollapsed={isCollapsed} collapsedHeight={COLLAPSED_HEIGHT} locale={locale} class={className} style={style}>
     <div class="flex gap-2 flex-wrap">
         {tags.map(t => (
-            <ButtonTag href={getTagUrl(t.name, locale)} label={`View all posts with the ${t.name.trim()} tag`}>
+            <ButtonTag href={getTagUrl(t.name, locale)} label={`${i18n(I18nKey.viewTag, locale)} ${t.name.trim()}`}>
                 {t.name.trim()}
             </ButtonTag>
         ))}

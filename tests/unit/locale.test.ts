@@ -1,4 +1,7 @@
 import { describe, expect, it } from "vitest";
+import I18nKey from "../../src/i18n/i18nKey";
+import { en } from "../../src/i18n/languages/en";
+import { zh_CN } from "../../src/i18n/languages/zh_CN";
 import { isHomePath, localeFromPathname, localePath } from "../../src/utils/locale";
 import {
 	getArchiveUrl,
@@ -61,5 +64,19 @@ describe("语言切换", () => {
 	it("文章页由文章自身的译文链接负责，不在导航里猜路径", () => {
 		expect(switchLocaleUrl("/posts/a-quieter-morning/", "en")).toBeUndefined();
 		expect(switchLocaleUrl("/en/posts/a-quieter-morning/", "zh")).toBeUndefined();
+	});
+
+	it("目标语言没有对应分页时返回目标首页", () => {
+		expect(switchLocaleUrl("/2/", "en", 1)).toBe("/en/");
+		expect(switchLocaleUrl("/3/", "en", 3)).toBe("/en/3/");
+	});
+});
+
+describe("界面词典", () => {
+	it("启用的两种语言覆盖所有界面键", () => {
+		for (const key of Object.values(I18nKey)) {
+			expect(en[key], `en: ${key}`).toBeTruthy();
+			expect(zh_CN[key], `zh_CN: ${key}`).toBeTruthy();
+		}
 	});
 });

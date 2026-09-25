@@ -21,16 +21,6 @@ interface Props {
 const { entry, locale } = Astro.props;
 const { Content, headings, remarkPluginFrontmatter } = await entry.render();
 
-// 译文入口按目标语言给出明文标签，词典里没有「阅读译文」这类键，避免为一次使用扩充十份词典。
-const translationLabel =
-	entry.translation?.locale === "en"
-		? locale === "zh"
-			? "阅读英文版"
-			: "Read in English"
-		: locale === "zh"
-			? "阅读中文版"
-			: "Read in Chinese";
-
 const jsonLd = {
 	"@context": "https://schema.org",
 	"@type": "BlogPosting",
@@ -101,13 +91,6 @@ const jsonLd = {
                         category={entry.data.category}
                         locale={locale}
                 ></PostMetadata>
-                {entry.translation && (
-                    <a href={getPostUrl(entry.translation.locale, entry.translation.slug)}
-                       class="transition btn-regular rounded-lg h-9 px-3 gap-2 font-bold active:scale-95 inline-flex mb-5">
-                        <Icon name="material-symbols:translate" class="text-[1.25rem] text-[var(--btn-content)]"></Icon>
-                        {translationLabel}
-                    </a>
-                )}
                 {!entry.cover && <div class="border-[var(--line-divider)] border-dashed border-b-[1px] mb-5"></div>}
             </div>
 

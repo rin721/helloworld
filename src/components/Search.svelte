@@ -18,19 +18,11 @@ let initialized = false;
 
 const fakeResult: SearchResult[] = [
 	{
-		url: url("/"),
+		url: url(locale === "en" ? "/en/" : "/"),
 		meta: {
-			title: "This Is a Fake Search Result",
+			title: i18n(I18nKey.searchDevTitle, locale),
 		},
-		excerpt:
-			"Because the search cannot work in the <mark>dev</mark> environment.",
-	},
-	{
-		url: url("/"),
-		meta: {
-			title: "If You Want to Test the Search",
-		},
-		excerpt: "Try running <mark>npm build && npm preview</mark> instead.",
+		excerpt: i18n(I18nKey.searchDevDescription, locale),
 	},
 ];
 
@@ -154,7 +146,7 @@ $: if (initialized && keywordMobile) {
 </div>
 
 <!-- toggle btn for phone/tablet view -->
-<button on:click={togglePanel} aria-label="Search Panel" id="search-switch"
+<button on:click={togglePanel} aria-label={i18n(I18nKey.searchPanel, locale)} id="search-switch"
         class="btn-plain scale-animation lg:!hidden rounded-lg w-11 h-11 active:scale-90">
     <Icon icon="material-symbols:search" class="text-[1.25rem]"></Icon>
 </button>

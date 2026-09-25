@@ -25,9 +25,9 @@ export const siteConfig: SiteConfig = {
 		src: "assets/images/demo-banner.png",
 		position: "center",
 		credit: {
-			enable: false,
-			text: "",
-			url: "",
+			enable: true,
+			text: "GPTImage",
+			url: "https://chatgpt.com",
 		},
 	},
 	toc: {
@@ -48,17 +48,17 @@ export const siteText: Record<
 	{ subtitle: string; description: string; author: string; bio: string }
 > = {
 	zh: {
-		subtitle: "在文字与光影之间",
+		subtitle: "咕咕嘎嘎",
 		description:
 			"在文字与光影之间，记录生活，整理思考。一个关于日常、学习与慢慢生长的个人博客。",
-		author: "Hello World",
+		author: "Rin's Blog",
 		bio: "这是一处等待真实故事的写作空间。",
 	},
 	en: {
 		subtitle: "Between words and light",
 		description:
 			"A personal journal of everyday discoveries, things learned, and moments worth keeping. A little space to think, slowly.",
-		author: "Hello World",
+		author: "Rin's Blog",
 		bio: "A writing space waiting for real stories.",
 	},
 };
@@ -73,12 +73,21 @@ export const kindLabels: Record<
 };
 
 export const navBarConfig: NavBarConfig = {
-	links: [LinkPreset.Home, LinkPreset.Archive, LinkPreset.About],
+	links: [
+		LinkPreset.Home,
+		LinkPreset.Archive,
+		LinkPreset.About,
+		{
+			name: "GitHub",
+			url: "https://github.com/rin721", // Internal links should not include the base path, as it is automatically added
+			external: true, // Show an external link icon and will open in a new tab
+		},
+	],
 };
 
 export const profileConfig: ProfileConfig = {
 	avatar: "assets/images/demo-avatar.png",
-	name: "Hello World",
+	name: "Xiaolin",
 	bio: "这是一处等待真实故事的写作空间。",
 	links: [],
 };

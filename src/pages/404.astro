@@ -1,4 +1,6 @@
 ---
+import I18nKey from "@i18n/i18nKey";
+import { i18n } from "@i18n/translation";
 import MainGridLayout from "@layouts/MainGridLayout.astro";
 import { defaultLocale } from "@utils/locale";
 import { getArchiveUrl, getHomeUrl } from "@utils/url-utils";
@@ -10,12 +12,12 @@ const locale = defaultLocale;
     <div class="card-base px-8 py-10 text-center">
         <div class="text-3xl font-bold mb-3 text-90">404</div>
         <p class="text-50 mb-6 transition">
-            这个页面不存在，或已经被移动到别处。<br/>
-            This page does not exist or has moved.
+            {i18n(I18nKey.pageNotFound, locale)}<br/>
+            {i18n(I18nKey.pageNotFound, "en")}
         </p>
         <div class="flex flex-wrap gap-3 justify-center">
-            <a class="btn-regular rounded-lg h-10 px-4 font-bold active:scale-95 inline-flex" href={getHomeUrl(locale)}>返回首页 · Back home</a>
-            <a class="btn-regular rounded-lg h-10 px-4 font-bold active:scale-95 inline-flex" href={getArchiveUrl(locale)}>归档 · Archive</a>
+            <a class="btn-regular rounded-lg h-10 px-4 font-bold active:scale-95 inline-flex" href={getHomeUrl(locale)}>{i18n(I18nKey.backHome, locale)} · {i18n(I18nKey.backHome, "en")}</a>
+            <a class="btn-regular rounded-lg h-10 px-4 font-bold active:scale-95 inline-flex" href={getArchiveUrl(locale)}>{i18n(I18nKey.archive, locale)} · {i18n(I18nKey.archive, "en")}</a>
         </div>
     </div>
 </MainGridLayout>

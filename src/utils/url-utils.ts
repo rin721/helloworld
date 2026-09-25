@@ -63,13 +63,18 @@ const staticPaths = new Set(["", "archive", "about"]);
 export function switchLocaleUrl(
 	pathname: string,
 	target: AppLocale,
+	targetPageCount = Number.POSITIVE_INFINITY,
 ): string | undefined {
 	const current = localeFromPathname(pathname);
 	const rest = pathname
 		.replace(new RegExp(`^/${current}/`), "/")
 		.replace(/^\/+|\/+$/g, "");
-	if (staticPaths.has(rest) || /^\d+$/.test(rest))
-		return localePath(target, rest);
+	if (/^\d+$/.test(rest)) {
+		return Number(rest) <= targetPageCount
+			? localePath(target, rest)
+			: localePath(target);
+	}
+	if (staticPaths.has(rest)) return localePath(target, rest);
 	return undefined;
 }
 

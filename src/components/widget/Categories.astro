@@ -21,14 +21,14 @@ const COLLAPSE_THRESHOLD = 5;
 const isCollapsed = categories.length >= COLLAPSE_THRESHOLD;
 ---
 
-<WidgetLayout name={i18n(I18nKey.categories, locale)} id="categories" isCollapsed={isCollapsed} collapsedHeight={COLLAPSED_HEIGHT}
+<WidgetLayout name={i18n(I18nKey.categories, locale)} id="categories" isCollapsed={isCollapsed} collapsedHeight={COLLAPSED_HEIGHT} locale={locale}
                 class={className} style={style}
 >
     {categories.map((c) =>
         <ButtonLink
             url={c.url}
             badge={String(c.count)}
-            label={`View all posts in the ${c.name.trim()} category`}
+            label={`${i18n(I18nKey.viewCategory, locale)} ${c.name.trim()}`}
         >
             {c.name.trim()}
         </ButtonLink>

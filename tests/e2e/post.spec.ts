@@ -15,15 +15,17 @@ test.describe("文章页", () => {
 		await expect(page.locator("#toc a").first()).toBeVisible();
 	});
 
-	test("中英译文互相链接，无译文时不显示译文入口", async ({ page }) => {
+	test("文章正文不显示译文按钮，顶部导航始终提供语言切换", async ({ page }) => {
 		await page.goto("/posts/a-quieter-morning/");
-		await expect(page.locator('a[href="/en/posts/a-quieter-morning/"]')).toBeVisible();
+		await expect(page.locator("#post-container a[data-locale-switch]")).toHaveCount(0);
+		await expect(page.locator('#navbar a[hreflang="en"]')).toHaveAttribute("href", "/en/");
 
 		await page.goto("/en/posts/a-quieter-morning/");
-		await expect(page.locator('a[href="/posts/a-quieter-morning/"]')).toBeVisible();
+		await expect(page.locator("#post-container a[data-locale-switch]")).toHaveCount(0);
+		await expect(page.locator('#navbar a[hreflang="zh"]')).toHaveAttribute("href", "/");
 
 		await page.goto("/posts/blue-hour/");
-		expect(await page.locator('a[href^="/en/posts/"]').count()).toBe(0);
+		await expect(page.locator('#navbar a[hreflang="en"]')).toHaveAttribute("href", "/en/");
 	});
 
 	test("同语言内提供上一篇与下一篇", async ({ page }) => {

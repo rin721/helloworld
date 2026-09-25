@@ -13,7 +13,7 @@ import { zh_CN } from "./languages/zh_CN";
 import { zh_TW } from "./languages/zh_TW";
 
 export type Translation = {
-	[K in I18nKey]: string;
+	[K in I18nKey]?: string;
 };
 
 const defaultTranslation = en;
@@ -54,5 +54,5 @@ export const dictionaryLang: Record<AppLocale, string> = {
  * 否则中英文页面会互相污染。
  */
 export function i18n(key: I18nKey, locale: AppLocale = defaultLocale): string {
-	return getTranslation(dictionaryLang[locale])[key];
+	return getTranslation(dictionaryLang[locale])[key] ?? en[key] ?? key;
 }

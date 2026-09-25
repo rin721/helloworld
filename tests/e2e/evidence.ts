@@ -17,6 +17,13 @@ export async function capture(
 	const dir = path.join(evidenceRoot, group);
 	await mkdir(dir, { recursive: true });
 	await expect(page.locator("body")).toBeVisible();
+	await page.locator("img").evaluateAll(async (images) => {
+		const pictures = images.filter(
+			(image): image is HTMLImageElement => image instanceof HTMLImageElement,
+		);
+		for (const image of pictures) image.loading = "eager";
+		await Promise.all(pictures.map((image) => image.decode().catch(() => {})));
+	});
 	await page.waitForTimeout(options.wait ?? 450);
 	await page.screenshot({
 		path: path.join(dir, `${name}.png`),

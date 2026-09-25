@@ -7,6 +7,7 @@
 | [内容维护](content/authoring.md) | 作者如何写作、组织图片、发布及翻译 |
 | [部署与验收](deployment.md) | Cloudflare Pages 配置、构建边界和上线检查 |
 | [决策记录](decisions/0004-fuwari-based-rebuild.md) | 为什么以 fuwari 为源码基线，以及由此产生的后果 |
+| [语言偏好决策](decisions/0005-locale-preference.md) | 双语静态路由与浏览器偏好的边界 |
 | [视觉证据](evidence/README.md) | 桌面、平板、手机与深色主题截图及像素统计 |
 | [AGENTS.md](../AGENTS.md) | 代理与协作者的长期约束 |
 | [README](../README.md) | 快速开始、命令表与文档索引 |
